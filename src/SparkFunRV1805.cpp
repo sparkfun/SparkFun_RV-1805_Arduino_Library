@@ -126,6 +126,61 @@ bool RV1805::setTime(uint8_t * time, uint8_t len)
 	return writeMultipleRegisters(RV1805_HUNDREDTHS, time, TIME_ARRAY_LENGTH);
 }
 
+bool RV1805::setHundredths(uint8_t value)
+{
+	_time[TIME_HUNDREDTHS] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setSeconds(uint8_t value)
+{
+	_time[TIME_SECONDS] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setMinutes(uint8_t value)
+{
+	_time[TIME_MINUTES] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setHours(uint8_t value)
+{
+	_time[TIME_HOURS] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setDate(uint8_t value)
+{
+	_time[TIME_DATE] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setMonth(uint8_t value)
+{
+	_time[TIME_MONTH] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setYear(uint8_t value)
+{
+	_time[TIME_YEAR] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::setWeekday(uint8_t value)
+{
+	_time[TIME_DAY] = DECtoBCD(value);
+	return setTime(_time, TIME_ARRAY_LENGTH);
+}
+
+bool RV1805::updateTime(void)
+{
+	uint8_t rtcReads[8];
+	
+	if (readMultipleRegisters())
+	
+}
 bool RV1805::autoTime()
 {
 	_time[TIME_SECONDS] = DECtoBCD(BUILD_SECOND);
