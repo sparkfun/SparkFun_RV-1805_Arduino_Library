@@ -93,7 +93,8 @@ boolean RV1805::begin(TwoWire &wirePort)
 		Serial.println("Sensor failed to respond. Check wiring.");
 		while (1); //Freeze!
 	}
-
+	enableTrickleCharge();
+	enableLowPower();
 	if (_sensorVersion == 0x18) Serial.println("RV-1805 online!");
 	return (true);
 }
@@ -221,6 +222,46 @@ bool RV1805::updateTime()
 	}
 }
 
+void RV1805::getHundredths()
+{
+	return BCDtoDEC(_time[TIME_HUNDREDTHS]);
+}
+
+void RV1805::getSeconds()
+{
+	return BCDtoDEC(_time[TIME_SECONDS]);
+}
+
+void RV1805::getMinutes()
+{
+	return BCDtoDEC(_time[TIME_MINUTES]);
+}
+
+void RV1805::getHours()
+{
+	return BCDtoDEC(_time[TIME_HOURS]);
+}
+
+void RV1805::getWeekday()
+{
+	return BCDtoDEC(_time[TIME_DAY]);
+}
+
+void RV1805::getDate()
+{
+	return BCDtoDEC(_time[TIME_DATE]);
+}
+
+void RV1805::getMonth()
+{
+	return BCDtoDEC(_time[TIME_MONTH]);
+}
+
+void RV1805::getYear()
+{
+	return BCDtoDEC(_time[TIME_YEAR]);
+}
+
 bool RV1805::autoTime()
 {
 	_time[TIME_SECONDS] = DECtoBCD(BUILD_SECOND);
@@ -320,6 +361,14 @@ void RV1805::enableTrickleCharge(byte diode, byte rOut)
 	value |= (diode << 2);
 	value |= rOut;
 	writeRegister(RV1805_TRICKLE_CHRG, value);
+}
+
+void RV1805::enableLowPower()
+{
+	writeRegister(RV1805_CONF_KEY, 0x9D);
+	writeRegister(RV1805_IOBATMODE, 0x00);
+	writeRegister(RV1805_CONF_KEY, 0x9D);
+	writeRegister(RV1805_OUT_CTRL, 0b00110000);
 }
 
 uint8_t RV1805::BCDtoDEC(uint8_t val)

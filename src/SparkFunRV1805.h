@@ -107,6 +107,14 @@ class RV1805
 	bool updateTime();
 	
 	void printTime();
+	void getHundredths();
+	void getSeconds();
+	void getMinutes();
+	void getHours();
+	void getWeekday();
+	void getDate();
+	void getMonth();
+	void getYear();	
 	
 	bool autoTime();
 	
@@ -114,7 +122,8 @@ class RV1805
 	bool setAlarm(uint8_t * time, uint8_t len);
 	void setAlarmRepeat(byte mode);
 	
-	void enableTrickleCharge(byte diode, byte rOut);
+	void enableTrickleCharge(byte diode = 0b01, byte rOut = 0b01);
+	void enableLowPower();
 	
 	uint8_t BCDtoDEC(uint8_t val);
 	uint8_t DECtoBCD(uint8_t val);
