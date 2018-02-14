@@ -23,12 +23,15 @@ Distributed as-is; no warranty is given.
 #define __RV1805_H__
 
 #include "stdint.h"
-
+#include <Wire.h>
+#include <Arduino.h>
 #define I2C_MODE 0
 #define SPI_MODE 1
 
 #define TWELVE_HOUR_MODE (1<<6)
+#define TWELVE_HOUR_PM (1<<5)
 
+#define RV1805_ADDR						0x69
 //Register names:
 #define RV1805_HUNDREDTHS               0x00
 #define RV1805_SECONDS      			0x01
@@ -88,21 +91,51 @@ class RV1805
 	
     RV1805( void );
 
-    uint8_t begin( void );
+    boolean begin( TwoWire &wirePort = Wire);
 
+	bool setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
+	bool setTime(uint8_t * time, uint8_t len);
+	bool setHundredths(uint8_t value);
+	bool setSeconds(uint8_t value);
+	bool setMinutes(uint8_t value);
+	bool setHours(uint8_t value);
+	bool setWeekday(uint8_t value);
+	bool setDate(uint8_t value);
+	bool setMonth(uint8_t value);
+	bool setYear(uint8_t value);
+	
+	bool updateTime();
+	
+	void printTime();
+	
+	bool autoTime();
+	
+	bool setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
+	bool setAlarm(uint8_t * time, uint8_t len);
+	void setAlarmRepeat(byte mode);
+	
+	void enableTrickleCharge(byte diode, byte rOut);
+	
+	uint8_t BCDtoDEC(uint8_t val);
+	uint8_t DECtoBCD(uint8_t val);
+	
+	bool is12Hour();
+	
 	//Software reset routine
 	void reset( void );
 	
-    //The following utilities read and write
 private:
-	TwoWire *_i2cPort
-	//readRegister reads one register
-    byte readRegister(byte addr);
-	//Writes a byte;
-    void writeRegister(byte addr, byte val);
+	uint8_t _time[TIME_ARRAY_LENGTH];
+	TwoWire *_i2cPort;
 	
-#define RV1805_ADDR						0x69
-
+	//The following utilities read and write
+    byte readRegister(byte addr);
+    void writeRegister(byte addr, byte val);
+	bool writeMultipleRegisters(byte addr, byte * values, uint8_t len);
+	bool readMultipleRegisters(byte addr, byte * dest, uint8_t len);
+	
+	bool _pm;
+	
 byte _sensorVersion = 0;
 };
 

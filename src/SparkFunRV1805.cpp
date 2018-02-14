@@ -76,7 +76,7 @@ RV1805::RV1805( void )
 
 }
 
-uint8_t RV1805::begin(TwoWire &wirePort)
+boolean RV1805::begin(TwoWire &wirePort)
 {
 	_i2cPort = &wirePort;
 	_i2cPort->begin();
@@ -95,12 +95,29 @@ uint8_t RV1805::begin(TwoWire &wirePort)
 	}
 
 	if (_sensorVersion == 0x18) Serial.println("RV-1805 online!");
+	return (true);
 }
 
 //Strictly resets.  Run .begin() afterwards
 void RV1805::reset( void )
 {
 	writeRegister(RV1805_CONF_KEY, 0x3C);	
+}
+
+void RV1805::printTime()
+{
+	Serial.print(BCDtoDEC(_time[TIME_MONTH]));
+	Serial.print("/");
+	Serial.print(BCDtoDEC(_time[TIME_DATE]));
+	Serial.print("/");
+	Serial.println(BCDtoDEC(_time[TIME_YEAR]));
+	Serial.print(BCDtoDEC(_time[TIME_HOURS]));
+	Serial.print(":");
+	Serial.print(BCDtoDEC(_time[TIME_MINUTES]));
+	Serial.print(":");
+	Serial.print(BCDtoDEC(_time[TIME_SECONDS]));
+	Serial.print(":");
+	Serial.println(BCDtoDEC(_time[TIME_HUNDREDTHS]));
 }
 
 bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day)
@@ -174,13 +191,36 @@ bool RV1805::setWeekday(uint8_t value)
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
-bool RV1805::updateTime(void)
+bool RV1805::updateTime()
 {
 	uint8_t rtcReads[8];
 	
-	if (readMultipleRegisters())
-	
+	if (readMultipleRegisters(RV1805_HUNDREDTHS, rtcReads, 8))
+	{
+		for (int i=0; i<TIME_ARRAY_LENGTH; i++)
+		{
+			_time[i] = rtcReads[i];
+		}
+		
+		_time[TIME_SECONDS] &= 0b01111111; // Mask out CH bit
+		
+		if (_time[TIME_HOURS] & TWELVE_HOUR_MODE)
+		{
+			if (_time[TIME_HOURS] & TWELVE_HOUR_PM)
+				_pm = true;
+			else
+				_pm = false;
+			_time[TIME_HOURS] &= 0x1F; // Mask out 24-hour bit from hours
+		}
+		
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
+
 bool RV1805::autoTime()
 {
 	_time[TIME_SECONDS] = DECtoBCD(BUILD_SECOND);
@@ -221,7 +261,7 @@ bool RV1805::autoTime()
 	int weekday = (d+=m<3?y--:y-2,23*m/9+d+4+y/4-y/100+y/400)%7 + 1;
 	_time[TIME_DAY] = DECtoBCD(weekday);
 	
-	setTime(_time, TIME_ARRAY_LENGTH);
+	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
 bool RV1805::setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day)
@@ -268,7 +308,7 @@ void RV1805::setAlarmRepeat(byte mode)
 	byte value = readRegister(RV1805_CTDWN_TMR_CTRL);
 	value &= 0b11100011;
 	value |= (mode << 2);
-	writeRegister(RV1805_CTDWN_TMR_CTRL);
+	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
 
 void RV1805::enableTrickleCharge(byte diode, byte rOut)
@@ -293,7 +333,7 @@ uint8_t RV1805::DECtoBCD(uint8_t val)
 	return ( ( val / 10 ) * 0x10 ) + ( val % 10 );
 }
 
-bool RV1805::is12Hour(void)
+bool RV1805::is12Hour()
 {
 	uint8_t hourRegister = readRegister(RV1805_CTRL1);
 	
@@ -324,29 +364,28 @@ void RV1805::writeRegister(byte addr, byte val)
 	_i2cPort->endTransmission();
 }
 
-bool RV1805::writeMultipleRegisters(byte addr, uint8_t * values, uint8_t len)
+bool RV1805::writeMultipleRegisters(byte addr, byte * values, uint8_t len)
 {
-	_i2cPort.beginTransmission(RV1805_ADDR);
-	_i2cPort.write(addr);
+	_i2cPort->beginTransmission(RV1805_ADDR);
+	_i2cPort->write(addr);
 	for (int i = 0; i < len; i++)
 	{
-		_i2cPort.write(values[i]);
+		_i2cPort->write(values[i]);
 	}
-	_i2cPort.endTransmission();
-	
+	_i2cPort->endTransmission();
 	return true;
 }
 
-bool DS1307::readMultipleRegisters(byte addr, uint8_t * dest, uint8_t len)
+bool RV1805::readMultipleRegisters(byte addr, byte * dest, uint8_t len)
 {
-	Wire.beginTransmission(RV1805_ADDR);
-	Wire.write(reg);
-	Wire.endTransmission();
+	_i2cPort->beginTransmission(RV1805_ADDR);
+	_i2cPort->write(addr);
+	_i2cPort->endTransmission();
 
-	Wire.requestFrom(deviceAddress, len);
+	_i2cPort->requestFrom(RV1805_ADDR, len);
 	for (int i = 0; i < len; i++)
 	{
-		dest[i] = Wire.read();
+		dest[i] = _i2cPort->read();
 	}
 	
 	return true;
