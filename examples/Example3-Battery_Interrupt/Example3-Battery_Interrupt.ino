@@ -12,6 +12,8 @@ void setup() {
   if (!rtc.autoTime()) {
     Serial.println("Something went wrong autotime");
   }
+  rtc.setAlarmRepeat(7);
+  rtc.setInterruptSource(0);
 }
 
 void loop() {

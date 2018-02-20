@@ -327,6 +327,32 @@ bool RV1805::setAlarm(uint8_t * time, uint8_t len)
 	return writeMultipleRegisters(RV1805_HUNDREDTHS_ALM, time, TIME_ARRAY_LENGTH);
 }
 
+/*********************************
+Source must be between 0, 1 or 2 to select the Interrupt Source
+0: Alarm Interrupt
+1: Timer Interrupt
+2: Battery Interrupt
+*********************************/
+
+void RV1805::setInterruptSource(byte source)
+{
+	if (source > 0b10) source = 0b10;
+	byte value = readRegister(RV1805_INT_MASK);
+	value &= 0b11100000;
+	switch (source) {
+		case 0:
+		value |= 0b00000100;
+		break;
+		case 1:
+		value |= 0b00001000;
+		break;
+		case 2:
+		value |= 0b00010000;
+		break;
+	}
+	writeRegister(RV1805_INT_MASK, value);
+}
+
 /********************************
 Mode must be between 0 and 7 to tell when the alarm should be triggered. 
 Alarm is triggered when listed characteristics match
@@ -360,6 +386,14 @@ void RV1805::enableTrickleCharge(byte diode, byte rOut)
 	value |= 0b10100000;
 	value |= (diode << 2);
 	value |= rOut;
+	writeRegister(RV1805_TRICKLE_CHRG, value);
+}
+
+void RV1805::disableTrickleCharge()
+{
+	writeRegister(RV1805_CONF_KEY, 0x9D);
+	byte value = readRegister(RV1805_TRICKLE_CHRG);
+	value &= 0b00000000;
 	writeRegister(RV1805_TRICKLE_CHRG, value);
 }
 

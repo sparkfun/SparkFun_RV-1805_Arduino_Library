@@ -26,7 +26,6 @@ Distributed as-is; no warranty is given.
 #include <Wire.h>
 #include <Arduino.h>
 #define I2C_MODE 0
-#define SPI_MODE 1
 
 #define TWELVE_HOUR_MODE (1<<6)
 #define TWELVE_HOUR_PM (1<<5)
@@ -123,7 +122,12 @@ class RV1805
 	void setAlarmRepeat(byte mode);
 	
 	void enableTrickleCharge(byte diode = 0b01, byte rOut = 0b01);
+	void disableTrickleCharge();
 	void enableLowPower();
+	
+	void setInterruptSource(byte source);
+	
+	void enableLowBatteryInterrupt()
 	
 	uint8_t BCDtoDEC(uint8_t val);
 	uint8_t DECtoBCD(uint8_t val);
