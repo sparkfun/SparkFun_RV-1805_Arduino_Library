@@ -127,8 +127,13 @@ class RV1805
 	
 	void setInterruptSource(byte source);
 	
-	void enableLowBatteryInterrupt()
+	void enableBatteryInterrupt(byte voltage, bool edgeTrigger);
 	
+	void clearInterrupts();
+	
+	bool checkBattery(byte voltage, bool edgeTrigger);
+	
+	void setReferenceVoltage(byte voltage, bool edgeTrigger);
 	uint8_t BCDtoDEC(uint8_t val);
 	uint8_t DECtoBCD(uint8_t val);
 	

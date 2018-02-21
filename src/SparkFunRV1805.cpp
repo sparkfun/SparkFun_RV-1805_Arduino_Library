@@ -95,6 +95,7 @@ boolean RV1805::begin(TwoWire &wirePort)
 	}
 	enableTrickleCharge();
 	enableLowPower();
+	writeRegister(RV1805_CTRL1, 0b00010111);
 	if (_sensorVersion == 0x18) Serial.println("RV-1805 online!");
 	return (true);
 }
@@ -336,7 +337,7 @@ Source must be between 0, 1 or 2 to select the Interrupt Source
 
 void RV1805::setInterruptSource(byte source)
 {
-	if (source > 0b10) source = 0b10;
+	if (source > 2) source = 2;
 	byte value = readRegister(RV1805_INT_MASK);
 	value &= 0b11100000;
 	switch (source) {
@@ -392,8 +393,7 @@ void RV1805::enableTrickleCharge(byte diode, byte rOut)
 void RV1805::disableTrickleCharge()
 {
 	writeRegister(RV1805_CONF_KEY, 0x9D);
-	byte value = readRegister(RV1805_TRICKLE_CHRG);
-	value &= 0b00000000;
+	byte value = 0b00000000;
 	writeRegister(RV1805_TRICKLE_CHRG, value);
 }
 
@@ -403,6 +403,80 @@ void RV1805::enableLowPower()
 	writeRegister(RV1805_IOBATMODE, 0x00);
 	writeRegister(RV1805_CONF_KEY, 0x9D);
 	writeRegister(RV1805_OUT_CTRL, 0b00110000);
+	writeRegister(RV1805_CONF_KEY, 0xA1); //Switch to RC Oscillator when powered by VBackup
+	writeRegister(RV1805_OSC_CTRL, 0b00010000);
+}
+
+/*******************************************
+The value of edgeTrigger controls whether or not the interrupt is 
+triggered by rising above or falling below the reference voltage.
+Different sets of reference voltages are available based on this value.
+
+edgeTrigger = FALSE; Falling Voltage
+0: 2.5V
+1: 2.1V
+2: 1.8V
+3: 1.4V
+
+edgeTrigger = TRUE; Rising Voltage
+0: 3.0V
+1: 2.5V
+2: 2.2V
+3: 1.6V
+*******************************************/
+
+void RV1805::enableBatteryInterrupt(byte voltage, bool edgeTrigger)
+{
+	setInterruptSource(2);
+	setReferenceVoltage(voltage, edgeTrigger);
+}
+
+bool RV1805::checkBattery(byte voltage, bool edgeTrigger)
+{
+	setReferenceVoltage(voltage, edgeTrigger);
+	byte status = readRegister(RV1805_ANLG_STAT);
+	if (status >= 0x80)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void RV1805::setReferenceVoltage(byte voltage, bool edgeTrigger)
+{
+	if (voltage > 3) voltage = 3;
+	
+	byte value;
+	switch (voltage)
+	{
+	case 0:
+		value = 0b01110000;
+		break;
+	case 1:
+		value = 0b10110000;
+		break;
+	case 2:
+		value = 0b11010000;
+		break;
+	case 3:
+		value = 0b11110000;
+		break;
+	}
+	writeRegister(RV1805_CONF_KEY, 0x9D);
+	writeRegister(RV1805_BREF_CTRL, value);
+	
+	value = readRegister(RV1805_RAM_EXT);
+	value &= 0b10111111;
+	value |= (edgeTrigger << 6);
+	writeRegister(RV1805_RAM_EXT, value);
+}
+
+void RV1805::clearInterrupts()
+{
+	readRegister(RV1805_STATUS);
 }
 
 uint8_t RV1805::BCDtoDEC(uint8_t val)
