@@ -18,7 +18,6 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-// Test derived class for base class SparkFunIMU
 #ifndef __RV1805_H__
 #define __RV1805_H__
 
@@ -31,6 +30,31 @@ Distributed as-is; no warranty is given.
 #define TWELVE_HOUR_PM (1<<5)
 
 #define RV1805_ADDR						0x69
+#define RV1805_HW_TYPE					0x18
+
+//Possible CONFKEY Values
+#define RV1805_CONF_RST					0x3C //value written to Configuration Key for reset
+#define RV1805_CONF_OSC					0xA1 //value written to Configuration Key for oscillator control register write enable
+#define RV1805_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
+
+//Bits in Control1 Register
+#define CTRL1_ARST			`			1 << 2 //Enables reset of interrupt flags in status register 
+
+//Trickle Charge Control
+#define TRICKLE_ENABLE					0xA0
+#define TRICKLE_DISABLE					0x00
+
+//Values to write to Registers to minimize power consumption
+#define IOBM_LOPWR						0x00
+#define OUTCTRL_LOPWR					0x30
+#define OSCCTRL_LOPWR					0x10
+
+//Reference Voltage
+#define TWO_FIVE						0x70
+#define TWO_ONE							0xB0
+#define ONE_EIGHT						0xD0
+#define ONE_FOUR						0xF0
+
 //Register names:
 #define RV1805_HUNDREDTHS               0x00
 #define RV1805_SECONDS      			0x01
@@ -73,6 +97,7 @@ Distributed as-is; no warranty is given.
 #define RV1805_RAM_EXT					0x3F
 
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
+
 enum time_order {
 	TIME_HUNDREDTHS, // 0
 	TIME_SECONDS,    // 1
@@ -117,7 +142,7 @@ class RV1805
 	
 	bool autoTime();
 	
-	bool setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
+	bool setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
 	bool setAlarm(uint8_t * time, uint8_t len);
 	void setAlarmRepeat(byte mode);
 	
@@ -134,6 +159,7 @@ class RV1805
 	bool checkBattery(byte voltage, bool edgeTrigger);
 	
 	void setReferenceVoltage(byte voltage, bool edgeTrigger);
+	
 	uint8_t BCDtoDEC(uint8_t val);
 	uint8_t DECtoBCD(uint8_t val);
 	

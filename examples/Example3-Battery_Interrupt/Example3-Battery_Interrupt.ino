@@ -1,3 +1,20 @@
+/*
+  Getting time from the RV-1805 Real Time Clock
+  By: Andy England
+  SparkFun Electronics
+  Date: 2/22/2017
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Feel like supporting our work? Buy a board from SparkFun!
+
+  Set a reference voltage and have the board alert you when the battery has charged above that voltage
+
+  Hardware Connections:
+  Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
+  Plug the RTC into the shield (any port)
+  Open the serial monitor at 115200 baud
+*/
+
 #include <SparkFunRV1805.h>
 
 RV1805 rtc;
@@ -10,7 +27,7 @@ void setup() {
     Serial.println("Something went wrong");
   }
   if (!rtc.autoTime()) {
-    Serial.println("Something went wrong autotime");
+    Serial.println("Something went wrong with autotime");
   }
 }
 

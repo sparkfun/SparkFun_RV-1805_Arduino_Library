@@ -5,10 +5,6 @@ Andy England @ SparkFun Electronics
 February 5, 2018
 https://github.com/sparkfun/Qwiic_RTC_Module
 
-Resources:
-Uses Wire.h for i2c operation
-Uses SPI.h for SPI operation
-
 Development environment specifics:
 Arduino IDE 1.6.4
 
@@ -82,7 +78,7 @@ boolean RV1805::begin(TwoWire &wirePort)
 	_i2cPort->begin();
 	Serial.begin(115200);
 	_sensorVersion = readRegister(RV1805_ID);
-	if (_sensorVersion != 0x18) //HW version for RV1805
+	if (_sensorVersion != RV1805_HW_TYPE) //HW version for RV1805
 	{
 		Serial.print("ID (should be 0x18): 0x");
 		Serial.println(_sensorVersion, HEX);
@@ -95,15 +91,17 @@ boolean RV1805::begin(TwoWire &wirePort)
 	}
 	enableTrickleCharge();
 	enableLowPower();
-	writeRegister(RV1805_CTRL1, 0b00010111);
-	if (_sensorVersion == 0x18) Serial.println("RV-1805 online!");
+	byte setting = readRegister(RV1805_CTRL1);
+	setting |= CTRL1_ARST; //Enables clearing of interrupt flags upon read of status register
+	writeRegister(RV1805_CTRL1, setting);
+	if (_sensorVersion == RV1805_HW_TYPE) Serial.println("RV-1805 online!");
 	return (true);
 }
 
 //Strictly resets.  Run .begin() afterwards
 void RV1805::reset( void )
 {
-	writeRegister(RV1805_CONF_KEY, 0x3C);	
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_RST);//Writes reset value from datasheet	
 }
 
 void RV1805::printTime()
@@ -199,7 +197,7 @@ bool RV1805::updateTime()
 	
 	if (readMultipleRegisters(RV1805_HUNDREDTHS, rtcReads, 8))
 	{
-		for (int i=0; i<TIME_ARRAY_LENGTH; i++)
+		for (int i=0; i < TIME_ARRAY_LENGTH; i++)
 		{
 			_time[i] = rtcReads[i];
 		}
@@ -306,7 +304,7 @@ bool RV1805::autoTime()
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
-bool RV1805::setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day)
+bool RV1805::setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month)
 {
 	_time[TIME_HUNDREDTHS] = DECtoBCD(hund);
 	_time[TIME_SECONDS] = DECtoBCD(sec);
@@ -314,8 +312,8 @@ bool RV1805::setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint
 	_time[TIME_HOURS] = DECtoBCD(hour);
 	_time[TIME_DATE] = DECtoBCD(date);
 	_time[TIME_MONTH] = DECtoBCD(month);
-	_time[TIME_YEAR] = DECtoBCD(year);
-	_time[TIME_DAY] = DECtoBCD(day);
+	_time[TIME_YEAR] = DECtoBCD(0); //Our alarm cannot read these values, so we set them to 0
+	_time[TIME_DAY] = DECtoBCD(0);
 	
 	return setAlarm(_time, TIME_ARRAY_LENGTH);
 }
@@ -339,18 +337,8 @@ void RV1805::setInterruptSource(byte source)
 {
 	if (source > 2) source = 2;
 	byte value = readRegister(RV1805_INT_MASK);
-	value &= 0b11100000;
-	switch (source) {
-		case 0:
-		value |= 0b00000100;
-		break;
-		case 1:
-		value |= 0b00001000;
-		break;
-		case 2:
-		value |= 0b00010000;
-		break;
-	}
+	value &= 0b11100000; //mask out all interrupt sources, leave CBE and Alarm Interrupt Mode alone
+	value |= 1 << (2 + source);
 	writeRegister(RV1805_INT_MASK, value);
 }
 
@@ -374,17 +362,17 @@ void RV1805::setAlarmRepeat(byte mode)
 	if (mode > 0b111) mode = 0b111;
 	
 	byte value = readRegister(RV1805_CTDWN_TMR_CTRL);
-	value &= 0b11100011;
+	value &= 0b11100011; //mask out bits to write to
 	value |= (mode << 2);
 	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
 
 void RV1805::enableTrickleCharge(byte diode, byte rOut)
 {
-	writeRegister(RV1805_CONF_KEY, 0x9D);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
 	byte value = readRegister(RV1805_TRICKLE_CHRG);
 	value &= 0b00000000;
-	value |= 0b10100000;
+	value |= TRICKLE_ENABLE;
 	value |= (diode << 2);
 	value |= rOut;
 	writeRegister(RV1805_TRICKLE_CHRG, value);
@@ -392,19 +380,18 @@ void RV1805::enableTrickleCharge(byte diode, byte rOut)
 
 void RV1805::disableTrickleCharge()
 {
-	writeRegister(RV1805_CONF_KEY, 0x9D);
-	byte value = 0b00000000;
-	writeRegister(RV1805_TRICKLE_CHRG, value);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
+	writeRegister(RV1805_TRICKLE_CHRG, TRICKLE_DISABLE);
 }
 
 void RV1805::enableLowPower()
 {
-	writeRegister(RV1805_CONF_KEY, 0x9D);
-	writeRegister(RV1805_IOBATMODE, 0x00);
-	writeRegister(RV1805_CONF_KEY, 0x9D);
-	writeRegister(RV1805_OUT_CTRL, 0b00110000);
-	writeRegister(RV1805_CONF_KEY, 0xA1); //Switch to RC Oscillator when powered by VBackup
-	writeRegister(RV1805_OSC_CTRL, 0b00010000);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
+	writeRegister(RV1805_IOBATMODE, IOBM_LOPWR);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
+	writeRegister(RV1805_OUT_CTRL, OUTCTRL_LOPWR);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_OSC); //Switch to RC Oscillator when powered by VBackup
+	writeRegister(RV1805_OSC_CTRL, OSCCTRL_LOPWR);
 }
 
 /*******************************************
@@ -453,23 +440,23 @@ void RV1805::setReferenceVoltage(byte voltage, bool edgeTrigger)
 	switch (voltage)
 	{
 	case 0:
-		value = 0b01110000;
+		value = TWO_FIVE;
 		break;
 	case 1:
-		value = 0b10110000;
+		value = TWO_ONE;
 		break;
 	case 2:
-		value = 0b11010000;
+		value = ONE_EIGHT;
 		break;
 	case 3:
-		value = 0b11110000;
+		value = ONE_FOUR;
 		break;
 	}
-	writeRegister(RV1805_CONF_KEY, 0x9D);
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
 	writeRegister(RV1805_BREF_CTRL, value);
 	
 	value = readRegister(RV1805_RAM_EXT);
-	value &= 0b10111111;
+	value &= 0b10111111; //Clear BPOL bit
 	value |= (edgeTrigger << 6);
 	writeRegister(RV1805_RAM_EXT, value);
 }
