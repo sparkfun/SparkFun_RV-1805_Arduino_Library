@@ -38,7 +38,7 @@ Distributed as-is; no warranty is given.
 #define RV1805_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
 
 //Bits in Control1 Register
-#define CTRL1_ARST			`			1 << 2 //Enables reset of interrupt flags in status register 
+#define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
 
 //Trickle Charge Control
 #define TRICKLE_ENABLE					0xA0
