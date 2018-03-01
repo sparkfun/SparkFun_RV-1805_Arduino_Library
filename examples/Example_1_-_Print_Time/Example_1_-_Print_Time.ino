@@ -21,7 +21,7 @@ RV1805 rtc;
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  delay(1);
   Serial.println("RTC BEGIN");
   if (!rtc.begin()) {
     Serial.println("Something went wrong, check wiring");
@@ -36,4 +36,5 @@ void loop() {
       rtc.printTime(); //prints time values
   }
   Serial.println();
+  delay(5000);
 }

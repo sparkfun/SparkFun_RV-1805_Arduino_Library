@@ -94,8 +94,23 @@ boolean RV1805::begin(TwoWire &wirePort)
 	byte setting = readRegister(RV1805_CTRL1);
 	setting |= CTRL1_ARST; //Enables clearing of interrupt flags upon read of status register
 	writeRegister(RV1805_CTRL1, setting);
+	set24Hour();
 	if (_sensorVersion == RV1805_HW_TYPE) Serial.println("RV-1805 online!");
 	return (true);
+}
+
+void RV1805::set12Hour()
+{
+	byte setting = readRegister(RV1805_CTRL1);
+	setting |= TWELVE_HOUR_MODE_ON;
+	writeRegister(RV1805_CTRL1, setting);
+}
+
+void RV1805::set24Hour()
+{
+	byte setting = readRegister(RV1805_CTRL1);
+	setting &= TWELVE_HOUR_MODE_OFF; //clears 12/24 hr bit
+	writeRegister(RV1805_CTRL1, setting);
 }
 
 //Strictly resets.  Run .begin() afterwards
@@ -204,7 +219,7 @@ bool RV1805::updateTime()
 		
 		_time[TIME_SECONDS] &= 0b01111111; // Mask out CH bit
 		
-		if (_time[TIME_HOURS] & TWELVE_HOUR_MODE)
+		if (_time[TIME_HOURS] & TWELVE_HOUR_MODE_ON)
 		{
 			if (_time[TIME_HOURS] & TWELVE_HOUR_PM)
 				_pm = true;
@@ -265,11 +280,11 @@ bool RV1805::autoTime()
 {
 	_time[TIME_SECONDS] = DECtoBCD(BUILD_SECOND);
 	_time[TIME_MINUTES] = DECtoBCD(BUILD_MINUTE);
-	_time[TIME_HOURS] = BUILD_HOUR;
+	_time[TIME_HOURS] = DECtoBCD(BUILD_HOUR);
 	if (is12Hour())
 	{
-		uint8_t pmBit = 0;
-		if (_time[TIME_HOURS] <= 11)
+	uint8_t pmBit = 0;
+		if (_time[TIME_HOURS] <= DECtoBCD(11))
 		{
 			if (_time[TIME_HOURS] == 0)
 			_time[TIME_HOURS] = 12;
@@ -277,12 +292,12 @@ bool RV1805::autoTime()
 		else
 		{
 			pmBit = TWELVE_HOUR_PM;
-			if (_time[TIME_HOURS] >= 13)
-			_time[TIME_HOURS] -= 12;
+			if (_time[TIME_HOURS] >= DECtoBCD(13))
+			_time[TIME_HOURS] -= DECtoBCD(12);
 		}
 		DECtoBCD(_time[TIME_HOURS]);
 		_time[TIME_HOURS] |= pmBit;
-		_time[TIME_HOURS] |= TWELVE_HOUR_MODE;
+		_time[TIME_HOURS] |= TWELVE_HOUR_MODE_ON;
 	}
 	else
 	{
@@ -481,7 +496,7 @@ bool RV1805::is12Hour()
 {
 	uint8_t hourRegister = readRegister(RV1805_CTRL1);
 	
-	return hourRegister & TWELVE_HOUR_MODE;
+	return hourRegister & TWELVE_HOUR_MODE_ON;
 }
 
 byte RV1805::readRegister(byte addr)

@@ -26,9 +26,6 @@ Distributed as-is; no warranty is given.
 #include <Arduino.h>
 #define I2C_MODE 0
 
-#define TWELVE_HOUR_MODE (1<<6)
-#define TWELVE_HOUR_PM (1<<5)
-
 #define RV1805_ADDR						0x69
 #define RV1805_HW_TYPE					0x18
 
@@ -43,6 +40,11 @@ Distributed as-is; no warranty is given.
 //Trickle Charge Control
 #define TRICKLE_ENABLE					0xA0
 #define TRICKLE_DISABLE					0x00
+
+//12/24 Hour Mode
+#define TWELVE_HOUR_MODE_ON (1 << 6)
+#define TWELVE_HOUR_PM (1 << 5)
+#define TWELVE_HOUR_MODE_OFF 0b10111111
 
 //Values to write to Registers to minimize power consumption
 #define IOBM_LOPWR						0x00
@@ -141,6 +143,9 @@ class RV1805
 	void getYear();	
 	
 	bool autoTime();
+	
+	void set12Hour();
+	void set24Hour();
 	
 	bool setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
 	bool setAlarm(uint8_t * time, uint8_t len);
