@@ -1,5 +1,5 @@
 /******************************************************************************
-SparkFunRV1805.h
+SparkFun_Qwiic_RTC_RV1805.h
 RV1805 Arduino Library
 Andy England @ SparkFun Electronics
 February 5, 2018

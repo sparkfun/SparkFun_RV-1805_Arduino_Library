@@ -1,5 +1,5 @@
 /******************************************************************************
-SparkFunRV1805.h
+SparkFun_Qwiic_RTC_RV1805.h
 RV1805 Arduino Library
 Andy England @ SparkFun Electronics
 February 5, 2018
@@ -14,10 +14,7 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#include "SparkFunRV1805.h"
-#include "stdint.h"
-
-#include "Wire.h"
+#include "SparkFun_Qwiic_RTC_RV1805.h"
 
 //****************************************************************************//
 //
