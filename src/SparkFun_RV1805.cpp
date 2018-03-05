@@ -199,7 +199,7 @@ char* RV1805::stringDateUSA()
 }
 
 //Returns a pointer to array of chars that are the date in dd/mm/yyyy format
-char*  RV1805::stringDateWorld()
+char*  RV1805::stringDate()
 {
 	static char date[11]; //Max of dd/mm/yyyy with \0 terminator
 	sprintf(date, "%02d/%02d/20%02d", BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_YEAR]));

@@ -47,7 +47,7 @@ void loop() {
   }
 
   String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
-  //String currentDate = rtc.stringDateWorld()); //Get the current date in dd/mm/yyyy format
+  //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
   String currentTime = rtc.stringTime(); //Get the time
 
   Serial.print(currentDate);

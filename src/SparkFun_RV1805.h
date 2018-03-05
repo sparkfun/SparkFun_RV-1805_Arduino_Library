@@ -168,7 +168,7 @@ class RV1805
 	bool updateTime(); //Update the local array with the RTC registers
 	
 	char* stringDateUSA(); //Return date in mm-dd-yyyy
-	char* stringDateWorld(); //Return date in dd-mm-yyyy
+	char* stringDate(); //Return date in dd-mm-yyyy
 	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
 	uint8_t getHundredths();
 	uint8_t getSeconds();
@@ -215,8 +215,8 @@ class RV1805
 	
     uint8_t readRegister(uint8_t addr);
     bool writeRegister(uint8_t addr, uint8_t val);
-	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);
+	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
 
 private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
