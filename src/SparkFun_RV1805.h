@@ -20,12 +20,6 @@ Distributed as-is; no warranty is given.
 
 #pragma once
 
-//#ifndef __RV1805_H__
-//#define __RV1805_H__
-
-//#include "stdint.h"
-#include <stdio.h>
-
 #if (ARDUINO >= 100)
 #include "Arduino.h"
 #else
@@ -33,9 +27,6 @@ Distributed as-is; no warranty is given.
 #endif
 
 #include <Wire.h>
-
-
-#define I2C_MODE 0
 
 //The 7-bit I2C address of the RV1805
 #define RV1805_ADDR						(uint8_t)0x69
@@ -58,9 +49,9 @@ Distributed as-is; no warranty is given.
 #define HOURS_AM_PM						5
 
 //Trickle Charge Control
-#define TRICKLE_CHARGER_TCS				4
-#define TRICKLE_CHARGER_DIODE			2
-#define TRICKLE_CHARGER_ROUT			0
+#define TRICKLE_CHARGER_TCS_OFFSET				4
+#define TRICKLE_CHARGER_DIODE_OFFSET			2
+#define TRICKLE_CHARGER_ROUT_OFFSET			0
 #define TRICKLE_ENABLE					0b1010
 #define TRICKLE_DISABLE					0b0000
 #define DIODE_DISABLE 					0b00
@@ -222,5 +213,3 @@ private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	TwoWire *_i2cPort;
 };
-
-//#endif

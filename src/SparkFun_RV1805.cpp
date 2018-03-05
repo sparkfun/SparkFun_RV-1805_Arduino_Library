@@ -472,16 +472,16 @@ void RV1805::enableTrickleCharge(uint8_t diode, uint8_t rOut)
 {
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT); //Write the correct value to CONFKEY to unlock this bank of registers
 	uint8_t value = 0;
-	value |= (TRICKLE_ENABLE << TRICKLE_CHARGER_TCS);
-	value |= (diode << TRICKLE_CHARGER_DIODE);
-	value |= (rOut << TRICKLE_CHARGER_ROUT);
+	value |= (TRICKLE_ENABLE << TRICKLE_CHARGER_TCS_OFFSET);
+	value |= (diode << TRICKLE_CHARGER_DIODE_OFFSET);
+	value |= (rOut << TRICKLE_CHARGER_ROUT_OFFSET);
 	writeRegister(RV1805_TRICKLE_CHRG, value);
 }
 
 void RV1805::disableTrickleCharge()
 {
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
-	writeRegister(RV1805_TRICKLE_CHRG, (TRICKLE_DISABLE << TRICKLE_CHARGER_TCS));
+	writeRegister(RV1805_TRICKLE_CHRG, (TRICKLE_DISABLE << TRICKLE_CHARGER_TCS_OFFSET));
 }
 
 void RV1805::enableLowPower()
