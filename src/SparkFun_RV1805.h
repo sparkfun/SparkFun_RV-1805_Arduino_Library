@@ -1,9 +1,9 @@
 /******************************************************************************
-SparkFun_Qwiic_RTC_RV1805.h
+SparkFun_RV1805.h
 RV1805 Arduino Library
 Andy England @ SparkFun Electronics
 February 5, 2018
-https://github.com/sparkfun/Qwiic_RTC_Module
+https://github.com/sparkfun/Qwiic_RTC
 
 Resources:
 Uses Wire.h for i2c operation
@@ -18,16 +18,30 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#ifndef __RV1805_H__
-#define __RV1805_H__
+#pragma once
 
-#include "stdint.h"
+//#ifndef __RV1805_H__
+//#define __RV1805_H__
+
+//#include "stdint.h"
+#include <stdio.h>
+
+#if (ARDUINO >= 100)
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 #include <Wire.h>
-#include <Arduino.h>
+
+
 #define I2C_MODE 0
 
-#define RV1805_ADDR						0x69
-#define RV1805_HW_TYPE					0x18
+//The 7-bit I2C address of the RV1805
+#define RV1805_ADDR						(uint8_t)0x69
+
+//The upper part of the part number is always 0x18
+#define RV1805_PART_NUMBER_UPPER		0x18
 
 //Possible CONFKEY Values
 #define RV1805_CONF_RST					0x3C //value written to Configuration Key for reset
@@ -35,21 +49,42 @@ Distributed as-is; no warranty is given.
 #define RV1805_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
 
 //Bits in Control1 Register
+#define CTRL1_STOP	7
+#define CTRL1_12_24	6
+#define CTRL1_PSWB	5
 #define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
 
+//Bits in Hours register
+#define HOURS_AM_PM						5
+
 //Trickle Charge Control
-#define TRICKLE_ENABLE					0xA0
-#define TRICKLE_DISABLE					0x00
+#define TRICKLE_CHARGER_TCS				4
+#define TRICKLE_CHARGER_DIODE			2
+#define TRICKLE_CHARGER_ROUT			0
+#define TRICKLE_ENABLE					0b1010
+#define TRICKLE_DISABLE					0b0000
+#define DIODE_DISABLE 					0b00
+#define DIODE_0_3V						0b01
+#define DIODE_0_6V						0b10
+#define ROUT_DISABLE					0b00
+#define ROUT_3K							0b01
+#define ROUT_6K							0b10
+#define ROUT_11K						0b11
 
-//12/24 Hour Mode
-#define TWELVE_HOUR_MODE_ON (1 << 6)
-#define TWELVE_HOUR_PM (1 << 5)
-#define TWELVE_HOUR_MODE_OFF 0b10111111
+//Interrupt Enable Bits
+#define INTERRUPT_BLIE	4
+#define INTERRUPT_TIE	3
+#define INTERRUPT_AIE	2
+#define INTERRUPT_EIE	1
 
-//Values to write to Registers to minimize power consumption
-#define IOBM_LOPWR						0x00
-#define OUTCTRL_LOPWR					0x30
-#define OSCCTRL_LOPWR					0x10
+//Status Bits
+#define STATUS_CB	7
+#define STATUS_BAT 6
+#define STATUS_WDF 5
+#define STATUS_BLF 4
+#define STATUS_TF 3
+#define STATUS_AF 2
+#define STATUS_EVF 1
 
 //Reference Voltage
 #define TWO_FIVE						0x70
@@ -93,7 +128,7 @@ Distributed as-is; no warranty is given.
 #define RV1805_BREF_CTRL				0x21
 #define RV1805_CAP_RC					0x26
 #define RV1805_IOBATMODE				0x27
-#define RV1805_ID						0x28
+#define RV1805_ID0						0x28
 #define RV1805_ANLG_STAT				0x2F
 #define RV1805_OUT_CTRL					0x30
 #define RV1805_RAM_EXT					0x3F
@@ -130,64 +165,62 @@ class RV1805
 	bool setMonth(uint8_t value);
 	bool setYear(uint8_t value);
 	
-	bool updateTime();
+	bool updateTime(); //Update the local array with the RTC registers
 	
-	void printTime();
-	void getHundredths();
-	void getSeconds();
-	void getMinutes();
-	void getHours();
-	void getWeekday();
-	void getDate();
-	void getMonth();
-	void getYear();	
+	char* stringDateUSA(); //Return date in mm-dd-yyyy
+	char* stringDateWorld(); //Return date in dd-mm-yyyy
+	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
+	uint8_t getHundredths();
+	uint8_t getSeconds();
+	uint8_t getMinutes();
+	uint8_t getHours();
+	uint8_t getWeekday();
+	uint8_t getDate();
+	uint8_t getMonth();
+	uint8_t getYear();	
 	
-	bool autoTime();
+	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC
 	
+	bool is12Hour(); //Returns true if 12hour bit is set
+	bool isPM(); //Returns true if is12Hour and PM bit is set
 	void set12Hour();
 	void set24Hour();
 	
-	bool setAlarm(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
-	bool setAlarm(uint8_t * time, uint8_t len);
-	void setAlarmRepeat(byte mode);
+	uint8_t status(); //Returns the status byte
 	
-	void enableTrickleCharge(byte diode = 0b01, byte rOut = 0b01);
+	bool setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
+	bool setAlarm(uint8_t * time, uint8_t len);
+	void setAlarmMode(uint8_t mode); //0 to 7, alarm goes off with match of second, minute, hour, etc
+	
+	void enableTrickleCharge(uint8_t diode = DIODE_0_3V, uint8_t rOut = ROUT_3K); //Diode default 0.3V, rOut default 3k
 	void disableTrickleCharge();
 	void enableLowPower();
-	
-	void setInterruptSource(byte source);
-	
-	void enableBatteryInterrupt(byte voltage, bool edgeTrigger);
+
+	void enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
+	void disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
+	void enableBatteryInterrupt(uint8_t voltage, bool edgeTrigger);
+	void enableAlarmInterrupt(); //Use in conjuction with setAlarm and setAlarmMode
 	
 	void clearInterrupts();
 	
-	bool checkBattery(byte voltage, bool edgeTrigger);
+	bool checkBattery(uint8_t voltage, bool edgeTrigger);
 	
-	void setReferenceVoltage(byte voltage, bool edgeTrigger);
+	void setReferenceVoltage(uint8_t voltage, bool edgeTrigger);
 	
-	uint8_t BCDtoDEC(uint8_t val);
+	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
+	uint8_t BCDtoDEC(uint8_t val); 
 	uint8_t DECtoBCD(uint8_t val);
+
+	void reset(void); //Fully reset RTC to all zeroes
 	
-	bool is12Hour();
-	
-	//Software reset routine
-	void reset( void );
-	
+    uint8_t readRegister(uint8_t addr);
+    bool writeRegister(uint8_t addr, uint8_t val);
+	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);
+	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);
+
 private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	TwoWire *_i2cPort;
-	
-	//The following utilities read and write
-    byte readRegister(byte addr);
-    void writeRegister(byte addr, byte val);
-	bool writeMultipleRegisters(byte addr, byte * values, uint8_t len);
-	bool readMultipleRegisters(byte addr, byte * dest, uint8_t len);
-	
-	bool _pm;
-	
-byte _sensorVersion = 0;
 };
 
-
-
-#endif
+//#endif

@@ -8,15 +8,15 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  Read the time value from the RV-1805 RTC
+  This example shows how to set the time on the RTC to the compiler time and read it back.
 
   Hardware Connections:
-  Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-  Plug the RTC into the shield (any port)
-  Open the serial monitor at 9600 baud
+    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
+    Plug the RTC into the shield (any port)
+    Open the serial monitor at 9600 baud
 */
 
-#include <SparkFunRV1805.h>
+#include <SparkFun_RV1805.h>
 
 RV1805 rtc;
 
@@ -26,20 +26,33 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("Read Time from RTC Example");
-  
-  if (!rtc.begin()) {
+
+  if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
-  if (!rtc.autoTime()) {
-    Serial.println("Something went wrong autotime");
+
+  //Use the time from the Arduino compiler (build time) to set the RTC
+  if (rtc.setToCompilerTime() == false) {
+    Serial.println("Something went wrong setting the time");
   }
+
+  Serial.println("RTC online!");
 }
 
 void loop() {
-  
-  /*if (rtc.updateTime()) {//updates time variable with time from current registers
-      rtc.printTime(); //prints time values
+
+  if (rtc.updateTime() == false) //Updates the time variables from RTC
+  {
+    Serial.print("RTC failed to update");
   }
-  Serial.println();*/
-  delay(5000);
+
+  String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
+  //String currentDate = rtc.stringDateWorld()); //Get the current date in dd/mm/yyyy format
+  String currentTime = rtc.stringTime(); //Get the time
+
+  Serial.print(currentDate);
+  Serial.print(" ");
+  Serial.println(currentTime);
+
+  delay(1000);
 }
