@@ -1,5 +1,5 @@
 /*
-  Getting time from the RV-1805 Real Time Clock
+  Trickle Charging the RV-1805 Real Time Clock
   By: Andy England
   SparkFun Electronics
   Date: 2/22/2017
@@ -8,12 +8,12 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  Set a reference voltage and have the board alert you when the battery has charged above that voltage
+  This example shows how to set the time on the RTC to the compiler time and read it back.
 
   Hardware Connections:
-  Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-  Plug the RTC into the shield (any port)
-  Open the serial monitor at 115200 baud
+    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
+    Plug the RTC into the shield (any port)
+    Open the serial monitor at 9600 baud
 */
 
 #include <SparkFun_RV1805.h>
@@ -25,19 +25,28 @@ void setup() {
   Wire.begin();
 
   Serial.begin(9600);
-  Serial.println("Battery Interrupt from RTC Example");
+  Serial.println("Read Time from RTC Example");
 
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
 
-  //Use the compiler time to set the RTC
+  rtc.disableTrickleCharge();//Trickle Charge is on by default, so let's turn it off
+  //The trickle charge circuit consists of a diode (.3v or .6v drop) in series with a resistor (3kOhm, 6kOhm, or 11kOhm)
+  //These are available to pass into the function as DIODE_0_3V, DIODE_0_6V, ROUT_3K, ROUT_6K, ROUT_11K. 
+  //The below call of enableTrickleCharge sets our trickle charge circuit up at the fastest possible rate, with a .3V diode and 3kOhm resistor
+  rtc.enableTrickleCharge(DIODE_0_3V, ROUT_3K);
+  
+  //Use the time from the Arduino compiler (build time) to set the RTC
   if (rtc.setToCompilerTime() == false) {
     Serial.println("Something went wrong setting the time");
   }
+
+  Serial.println("RTC online!");
 }
 
 void loop() {
+
   if (rtc.updateTime() == false) //Updates the time variables from RTC
   {
     Serial.print("RTC failed to update");
@@ -49,30 +58,7 @@ void loop() {
 
   Serial.print(currentDate);
   Serial.print(" ");
-  Serial.println(currentTime);  
+  Serial.println(currentTime);
 
-  /*******************************************
-    The value of edgeTrigger controls whether or not the interrupt is
-    triggered by rising above or falling below the reference voltage.
-    Different sets of reference voltages are available based on this value.
-
-    edgeTrigger = FALSE; Falling Voltage
-    0: 2.5V
-    1: 2.1V
-    2: 1.8V
-    3: 1.4V
-
-    edgeTrigger = TRUE; Rising Voltage
-    0: 3.0V
-    1: 2.5V
-    2: 2.2V
-    3: 1.6V
-  *******************************************/
-  if (rtc.checkBattery(1, true) == true)
-  {
-    Serial.print("Battery over 2.5V");
-  }
-  Serial.println();
   delay(1000);
-
 }

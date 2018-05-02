@@ -1,5 +1,5 @@
 /*
-  Getting time from the RV-1805 Real Time Clock
+  Getting the alarm to fire an interrupt on the RV-1805 Real Time Clock
   By: Andy England
   SparkFun Electronics
   Date: 2/22/2017
