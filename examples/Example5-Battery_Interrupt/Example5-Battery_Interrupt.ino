@@ -30,11 +30,7 @@ void setup() {
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
   }
-
-  //Use the compiler time to set the RTC
-  if (rtc.setToCompilerTime() == false) {
-    Serial.println("Something went wrong setting the time");
-  }
+  rtc.setEdgeTrigger(true);//Sets the EdgeTrigger to true, more information on edgeTrigger and its relation to reference voltage below.
 }
 
 void loop() {
@@ -68,7 +64,7 @@ void loop() {
     2: 2.2V
     3: 1.6V
   *******************************************/
-  if (rtc.checkBattery(1, true) == true)
+  if (rtc.checkBattery(1) == true)
   {
     Serial.print("Battery over 2.5V");
   }

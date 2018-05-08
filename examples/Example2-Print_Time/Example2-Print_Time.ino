@@ -1,5 +1,5 @@
 /*
-  Setting time from the RV-1805 Real Time Clock
+  Prints the time from the RV-1805 Real Time Clock
   By: Andy England
   SparkFun Electronics
   Date: 2/22/2017
@@ -8,7 +8,7 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14642
 
-  This example shows how to set the time on the RTC to the compiler time and read it back.
+  This example shows how to print the time fromt he RTC.
 
   Hardware Connections:
     Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
@@ -38,11 +38,6 @@ void setup() {
 
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
-  }
-
-  //Use the time from the Arduino compiler (build time) to set the RTC
-  if (rtc.setTime(hund, sec, minute, hour, date, month, year, day) == false) {
-    Serial.println("Something went wrong setting the time");
   }
 
   Serial.println("RTC online!");

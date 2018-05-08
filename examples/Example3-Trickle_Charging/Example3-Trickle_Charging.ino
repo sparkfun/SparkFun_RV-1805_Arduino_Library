@@ -35,13 +35,9 @@ void setup() {
   //The trickle charge circuit consists of a diode (.3v or .6v drop) in series with a resistor (3kOhm, 6kOhm, or 11kOhm)
   //These are available to pass into the function as DIODE_0_3V, DIODE_0_6V, ROUT_3K, ROUT_6K, ROUT_11K. 
   //The below call of enableTrickleCharge sets our trickle charge circuit up at the fastest possible rate, with a .3V diode and 3kOhm resistor
+  //Note that the trickle charger should only be used for charging the supercapacitor. Disable the rickle charger if you've connected a battery.
   rtc.enableTrickleCharge(DIODE_0_3V, ROUT_3K);
   
-  //Use the time from the Arduino compiler (build time) to set the RTC
-  if (rtc.setToCompilerTime() == false) {
-    Serial.println("Something went wrong setting the time");
-  }
-
   Serial.println("RTC online!");
 }
 

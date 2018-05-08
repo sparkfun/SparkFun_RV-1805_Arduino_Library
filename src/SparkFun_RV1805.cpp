@@ -521,13 +521,14 @@ edgeTrigger = TRUE; Rising Voltage
 *******************************************/
 void RV1805::enableBatteryInterrupt(uint8_t voltage, bool edgeTrigger)
 {
+	setEdgeTrigger(edgeTrigger);
 	enableInterrupt(INTERRUPT_BLIE); //Enable Battery Low Interrupt
-	setReferenceVoltage(voltage, edgeTrigger);
+	setReferenceVoltage(voltage);
 }
 
-bool RV1805::checkBattery(uint8_t voltage, bool edgeTrigger)
+bool RV1805::checkBattery(uint8_t voltage)
 {
-	setReferenceVoltage(voltage, edgeTrigger);
+	setReferenceVoltage(voltage);
 	uint8_t status = readRegister(RV1805_ANLG_STAT);
 	if (status >= 0x80)
 		return true;
@@ -535,10 +536,9 @@ bool RV1805::checkBattery(uint8_t voltage, bool edgeTrigger)
 	return false;
 }
 
-void RV1805::setReferenceVoltage(uint8_t voltage, bool edgeTrigger)
+void RV1805::setReferenceVoltage(uint8_t voltage)
 {
 	if (voltage > 3) voltage = 3;
-	
 	uint8_t value;
 	switch (voltage)
 	{
@@ -557,7 +557,11 @@ void RV1805::setReferenceVoltage(uint8_t voltage, bool edgeTrigger)
 	}
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT);
 	writeRegister(RV1805_BREF_CTRL, value);
-	
+}
+
+void RV1805::setEdgeTrigger(bool edgeTrigger)
+{
+	uint8_t value;
 	value = readRegister(RV1805_RAM_EXT);
 	value &= ~(1<<6); //Clear BPOL bit
 	value |= (edgeTrigger << 6);

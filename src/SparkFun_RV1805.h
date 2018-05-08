@@ -194,9 +194,9 @@ class RV1805
 	
 	void clearInterrupts();
 	
-	bool checkBattery(uint8_t voltage, bool edgeTrigger);
-	
-	void setReferenceVoltage(uint8_t voltage, bool edgeTrigger);
+	bool checkBattery(uint8_t voltage);
+	void setEdgeTrigger(bool edgeTrigger);
+	void setReferenceVoltage(uint8_t voltage);
 	
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
 	uint8_t BCDtoDEC(uint8_t val); 

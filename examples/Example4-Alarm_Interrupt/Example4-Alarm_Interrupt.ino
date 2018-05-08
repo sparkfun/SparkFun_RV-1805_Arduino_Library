@@ -38,11 +38,6 @@ void setup() {
     Serial.println("Something went wrong, check wiring");
   }
 
-  //Use the compiler time to set the RTC
-  if (rtc.setToCompilerTime() == false) {
-    Serial.println("Something went wrong setting the time");
-  }
-
   rtc.setAlarm(secondsAlarm, minuteAlarm, hourAlarm, dateAlarm, monthAlarm); //Sets the alarm with the values initialized above
 
   /********************************
@@ -57,9 +52,10 @@ void setup() {
     6: seconds match (once per minute)
     7: once per second
   ********************************/
-  rtc.setAlarmMode(7); //Once per second
+  //rtc.setAlarmMode(7); //Once per second
   //rtc.setAlarmMode(6); //Once per minute
   //rtc.setAlarmMode(5); //Once per hour: Alarm will go off every time there is a hundredths+seconds+minutes match (each hour)
+  rtc.setAlarmMode(4); //Alarm goes off every day
   rtc.enableInterrupt(INTERRUPT_AIE); //Enable the Alarm Interrupt
 }
 
