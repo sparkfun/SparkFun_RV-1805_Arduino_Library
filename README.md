@@ -1,4 +1,4 @@
-SparkFun RV-1805 RTC Arduino Library
+SparkFun Qwiic RTC RV-1805 Arduino Library
 ========================================
 
 ![Real Time Clock Module](https://cdn.sparkfun.com/r/500-500/assets/parts/1/2/6/9/1/14558-SparkFun_Real_Time_Clock_Module_-_RV-1805__Qwiic_-01.jpg)
