@@ -1,9 +1,9 @@
 SparkFun RV-1805 RTC Arduino Library
 ========================================
 
-![SparkFun Qwiic RTC Breakout](https://cdn.sparkfun.com//assets/parts/1/2/8/2/5/14642-Qwiic_RTC_-_RV-1805-05.jpg)
+![Real Time Clock Module](https://cdn.sparkfun.com/r/500-500/assets/parts/1/2/6/9/1/14558-SparkFun_Real_Time_Clock_Module_-_RV-1805__Qwiic_-01.jpg)
 
-[*SparkFun Qwiic RTC (SPX-14642)*](https://www.sparkfun.com/products/14642)
+[*Qwiic RV-1805 RTC Module (BOB-14558)*](https://www.sparkfun.com/products/14558)
 
 The RV-1805 is an extremely precise, extremely low power, highly configurable RTC. Under ideal conditions it runs at approximately 22nA with +/-6ppm per year of deviation (+/- 192 seconds worst case per year).
 
@@ -25,9 +25,13 @@ Repository Contents
 
 Documentation
 --------------
-
 * **[Installing an Arduino Library Guide](https://learn.sparkfun.com/tutorials/installing-an-arduino-library)** - Basic information on how to install an Arduino library.
-* **[Product Repository](https://github.com/sparkfunx/Qwiic-RTC)** - Main repository (including hardware files) for the SparkFun Qwiic RTC Breakout.
+* **[Product Repository](https://github.com/sparkfun/Qwiic_RTC_Module)** - Main repository (including hardware files) for the SparkFun Qwiic RTC Breakout.
+
+Products That Use This Library 
+---------------------------------
+* [BOB-14558](https://www.sparkfun.com/products/14558) - SparkFun red version
+* [SPX-14642](https://www.sparkfun.com/products/14642) - SparkX version
 
 License Information
 -------------------
