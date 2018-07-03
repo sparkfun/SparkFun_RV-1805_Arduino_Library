@@ -161,6 +161,8 @@ class RV1805
 	char* stringDateUSA(); //Return date in mm-dd-yyyy
 	char* stringDate(); //Return date in dd-mm-yyyy
 	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode
+	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss
+	
 	uint8_t getHundredths();
 	uint8_t getSeconds();
 	uint8_t getMinutes();

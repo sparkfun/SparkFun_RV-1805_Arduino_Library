@@ -34,6 +34,7 @@ updateTime	KEYWORD2
 stringDateUSA	KEYWORD2
 stringDate	KEYWORD2
 stringTime	KEYWORD2
+stringTimeStamp	KEYWORD2
 
 setToCompilerTime	KEYWORD2
 is12Hour	KEYWORD2
