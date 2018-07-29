@@ -68,6 +68,16 @@ Distributed as-is; no warranty is given.
 #define INTERRUPT_AIE	2
 #define INTERRUPT_EIE	1
 
+//PSW Pin Function Selection Bits
+#define PSWS_OFFSET     2
+#define PSWS_INV_IRQ    0b000
+#define PSWS_SQW        0b001
+#define PSWS_INV_AIRQ   0b011
+#define PSWS_TIRQ       0b100
+#define PSWS_INV_TIRQ   0b101
+#define PSWS_SLEEP      0b110
+#define PSWS_STATIC     0b111
+
 //Status Bits
 #define STATUS_CB	7
 #define STATUS_BAT 6
@@ -184,6 +194,11 @@ class RV1805
 	bool setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
 	bool setAlarm(uint8_t * time, uint8_t len);
 	void setAlarmMode(uint8_t mode); //0 to 7, alarm goes off with match of second, minute, hour, etc
+ 
+ 	void enableSleep();
+    void setPowerSwitchFunction(uint8_t function);
+    void setPowerSwitchLock(bool lock);
+    void setStaticPowerSwitchOutput(bool psw); // PSW pin must be unlocked using setPSWLock(false) to enable static PSW output
 	
 	void enableTrickleCharge(uint8_t diode = DIODE_0_3V, uint8_t rOut = ROUT_3K); //Diode default 0.3V, rOut default 3k
 	void disableTrickleCharge();

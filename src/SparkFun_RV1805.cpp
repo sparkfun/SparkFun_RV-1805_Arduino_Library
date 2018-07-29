@@ -427,6 +427,41 @@ bool RV1805::setAlarm(uint8_t * alarmTime, uint8_t len)
 	return writeMultipleRegisters(RV1805_HUNDREDTHS_ALM, alarmTime, TIME_ARRAY_LENGTH);
 }
 
+void RV1805::enableSleep()
+{
+    uint8_t value;
+    value = readRegister(RV1805_SLP_CTRL);
+    value |= (1 << 7);
+    writeRegister(RV1805_SLP_CTRL, value);
+}
+ 
+void RV1805::setPowerSwitchFunction(uint8_t function)
+{
+    uint8_t value;
+    value = readRegister(RV1805_CTRL2);
+    value &= 0b11000011; // Clear PSWS bits
+    value |= (function << PSWS_OFFSET);
+    writeRegister(RV1805_CTRL2, value);
+}
+ 
+void RV1805::setPowerSwitchLock(bool lock)
+{
+    uint8_t value;
+    value = readRegister(RV1805_OSC_STATUS);
+    value &= ~(1 << 5);
+    value |= (lock << 5);
+    writeRegister(RV1805_OSC_STATUS, value);
+}
+ 
+void RV1805::setStaticPowerSwitchOutput(bool psw)
+{
+    uint8_t value;
+    value = readRegister(RV1805_CTRL1);
+    value &= ~(1 << CTRL1_PSWB);
+    value |= (psw << CTRL1_PSWB);
+    writeRegister(RV1805_CTRL1, value);
+}
+
 /*********************************
 Given a bit location, enable the interrupt
 INTERRUPT_BLIE	4
@@ -456,7 +491,8 @@ Mode must be between 0 and 7 to tell when the alarm should be triggered.
 Alarm is triggered when listed characteristics match:
 0: Disabled
 1: Hundredths, seconds, minutes, hours, date and month match (once per year)
-2: Hundredths, seconds, minutes, hours and date match (once per month)3: Hundredths, seconds, minutes, hours and weekday match (once per week)
+2: Hundredths, seconds, minutes, hours and date match (once per month)
+3: Hundredths, seconds, minutes, hours and weekday match (once per week)
 4: Hundredths, seconds, minutes and hours match (once per day)
 5: Hundredths, seconds and minutes match (once per hour)
 6: Hundredths and seconds match (once per minute)
