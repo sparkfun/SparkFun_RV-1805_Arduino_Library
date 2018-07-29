@@ -456,7 +456,8 @@ Mode must be between 0 and 7 to tell when the alarm should be triggered.
 Alarm is triggered when listed characteristics match:
 0: Disabled
 1: Hundredths, seconds, minutes, hours, date and month match (once per year)
-2: Hundredths, seconds, minutes, hours and date match (once per month)3: Hundredths, seconds, minutes, hours and weekday match (once per week)
+2: Hundredths, seconds, minutes, hours and date match (once per month)
+3: Hundredths, seconds, minutes, hours and weekday match (once per week)
 4: Hundredths, seconds, minutes and hours match (once per day)
 5: Hundredths, seconds and minutes match (once per hour)
 6: Hundredths and seconds match (once per minute)
@@ -472,6 +473,27 @@ void RV1805::setAlarmMode(uint8_t mode)
 	uint8_t value = readRegister(RV1805_CTDWN_TMR_CTRL);
 	value &= 0b11100011; //Clear ARPT bits
 	value |= (mode << 2);
+	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
+}
+
+void RV1805::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool pulse)
+{
+	// Invalid configurations
+	if (duration == 0 || unit > 0b11) {
+		return;
+	}
+
+	// Set timer value
+	writeRegister(RV1805_CTDWN_TMR, (duration - 1));
+	writeRegister(RV1805_TMR_INITIAL, (duration - 1));
+
+	// Enable timer
+	uint8_t value = readRegister(RV1805_CTDWN_TMR_CTRL);
+	value &= 0b00011100; // Clear countdown timer bits while preserving ARPT
+	value |= unit; // Set clock frequency
+	value |= (!pulse << CTDWN_TMR_TM_OFFSET);
+	value |= (repeat << CTDWN_TMR_TRPT_OFFSET);
+	value |= (1 << CTDWN_TMR_TE_OFFSET); // Timer enable
 	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
 
