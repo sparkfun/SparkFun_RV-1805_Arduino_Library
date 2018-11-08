@@ -427,6 +427,43 @@ bool RV1805::setAlarm(uint8_t * alarmTime, uint8_t len)
 	return writeMultipleRegisters(RV1805_HUNDREDTHS_ALM, alarmTime, TIME_ARRAY_LENGTH);
 }
 
+
+void RV1805::enableSleep()
+{
+    uint8_t value;
+    value = readRegister(RV1805_SLP_CTRL);
+    value |= (1 << 7);
+    writeRegister(RV1805_SLP_CTRL, value);
+}
+ 
+void RV1805::setPowerSwitchFunction(uint8_t function)
+{
+    uint8_t value;
+    value = readRegister(RV1805_CTRL2);
+    value &= 0b11000011; // Clear PSWS bits
+    value |= (function << PSWS_OFFSET);
+    writeRegister(RV1805_CTRL2, value);
+}
+ 
+void RV1805::setPowerSwitchLock(bool lock)
+{
+    uint8_t value;
+    value = readRegister(RV1805_OSC_STATUS);
+    value &= ~(1 << 5);
+    value |= (lock << 5);
+    writeRegister(RV1805_OSC_STATUS, value);
+}
+ 
+void RV1805::setStaticPowerSwitchOutput(bool psw)
+{
+    uint8_t value;
+    value = readRegister(RV1805_CTRL1);
+    value &= ~(1 << CTRL1_PSWB);
+    value |= (psw << CTRL1_PSWB);
+    writeRegister(RV1805_CTRL1, value);
+}
+
+
 /*********************************
 Given a bit location, enable the interrupt
 INTERRUPT_BLIE	4
@@ -476,6 +513,7 @@ void RV1805::setAlarmMode(uint8_t mode)
 	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
 
+
 void RV1805::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool pulse)
 {
 	// Invalid configurations
@@ -496,6 +534,7 @@ void RV1805::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool
 	value |= (1 << CTDWN_TMR_TE_OFFSET); // Timer enable
 	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
+
 
 //Enable the charger and set the diode and inline resistor
 //Default is 0.3V for diode and 3k for resistor
