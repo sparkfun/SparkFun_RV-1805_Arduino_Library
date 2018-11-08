@@ -68,6 +68,13 @@ Distributed as-is; no warranty is given.
 #define INTERRUPT_AIE	2
 #define INTERRUPT_EIE	1
 
+//Countdown Timer Control
+#define COUNTDOWN_SECONDS		0b10
+#define COUNTDOWN_MINUTES		0b11
+#define CTDWN_TMR_TE_OFFSET		7
+#define CTDWN_TMR_TM_OFFSET		6
+#define CTDWN_TMR_TRPT_OFFSET	5
+
 //Status Bits
 #define STATUS_CB	7
 #define STATUS_BAT 6
@@ -185,6 +192,8 @@ class RV1805
 	bool setAlarm(uint8_t * time, uint8_t len);
 	void setAlarmMode(uint8_t mode); //0 to 7, alarm goes off with match of second, minute, hour, etc
 	
+	void setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat = true, bool pulse = true);
+
 	void enableTrickleCharge(uint8_t diode = DIODE_0_3V, uint8_t rOut = ROUT_3K); //Diode default 0.3V, rOut default 3k
 	void disableTrickleCharge();
 	void enableLowPower();
