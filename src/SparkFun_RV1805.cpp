@@ -427,6 +427,7 @@ bool RV1805::setAlarm(uint8_t * alarmTime, uint8_t len)
 	return writeMultipleRegisters(RV1805_HUNDREDTHS_ALM, alarmTime, TIME_ARRAY_LENGTH);
 }
 
+
 void RV1805::enableSleep()
 {
     uint8_t value;
@@ -461,6 +462,7 @@ void RV1805::setStaticPowerSwitchOutput(bool psw)
     value |= (psw << CTRL1_PSWB);
     writeRegister(RV1805_CTRL1, value);
 }
+
 
 /*********************************
 Given a bit location, enable the interrupt
@@ -510,6 +512,29 @@ void RV1805::setAlarmMode(uint8_t mode)
 	value |= (mode << 2);
 	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
 }
+
+
+void RV1805::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool pulse)
+{
+	// Invalid configurations
+	if (duration == 0 || unit > 0b11) {
+		return;
+	}
+
+	// Set timer value
+	writeRegister(RV1805_CTDWN_TMR, (duration - 1));
+	writeRegister(RV1805_TMR_INITIAL, (duration - 1));
+
+	// Enable timer
+	uint8_t value = readRegister(RV1805_CTDWN_TMR_CTRL);
+	value &= 0b00011100; // Clear countdown timer bits while preserving ARPT
+	value |= unit; // Set clock frequency
+	value |= (!pulse << CTDWN_TMR_TM_OFFSET);
+	value |= (repeat << CTDWN_TMR_TRPT_OFFSET);
+	value |= (1 << CTDWN_TMR_TE_OFFSET); // Timer enable
+	writeRegister(RV1805_CTDWN_TMR_CTRL, value);
+}
+
 
 //Enable the charger and set the diode and inline resistor
 //Default is 0.3V for diode and 3k for resistor
