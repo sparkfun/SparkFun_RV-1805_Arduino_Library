@@ -54,7 +54,7 @@ disableInterrupt	KEYWORD2
 enableBatteryInterrupt	KEYWORD2
 enableAlarmInterrupt	KEYWORD2
 
-setEdgeTrigger (KEYWORD2)
+setEdgeTrigger	KEYWORD2
 clearInterrupts	KEYWORD2
 checkBattery	KEYWORD2
 setReferenceVoltage	KEYWORD2
