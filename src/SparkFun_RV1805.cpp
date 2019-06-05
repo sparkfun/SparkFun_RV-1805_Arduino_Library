@@ -234,7 +234,7 @@ char* RV1805::stringTimeStamp()
 	return(timeStamp);
 }
 
-bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day)
+bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint16_t year, uint8_t day)
 {
 	_time[TIME_HUNDREDTHS] = DECtoBCD(hund);
 	_time[TIME_SECONDS] = DECtoBCD(sec);
@@ -242,7 +242,7 @@ bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8
 	_time[TIME_HOURS] = DECtoBCD(hour);
 	_time[TIME_DATE] = DECtoBCD(date);
 	_time[TIME_MONTH] = DECtoBCD(month);
-	_time[TIME_YEAR] = DECtoBCD(year);
+	_time[TIME_YEAR] = DECtoBCD(year - 2000);
 	_time[TIME_DAY] = DECtoBCD(day);
 		
 	return setTime(_time, TIME_ARRAY_LENGTH);

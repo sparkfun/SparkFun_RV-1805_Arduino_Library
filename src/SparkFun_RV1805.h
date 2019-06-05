@@ -164,7 +164,7 @@ class RV1805
 
     boolean begin( TwoWire &wirePort = Wire);
 
-	bool setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint8_t year, uint8_t day);
+	bool setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint16_t year, uint8_t day);
 	bool setTime(uint8_t * time, uint8_t len);
 	bool setHundredths(uint8_t value);
 	bool setSeconds(uint8_t value);
