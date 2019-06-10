@@ -244,8 +244,20 @@ bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8
 	_time[TIME_MONTH] = DECtoBCD(month);
 	_time[TIME_YEAR] = DECtoBCD(year - 2000);
 	_time[TIME_DAY] = DECtoBCD(day);
-		
-	return setTime(_time, TIME_ARRAY_LENGTH);
+	
+	bool status = false;
+	
+	if (is12Hour())
+	{
+		set24Hour();
+		status = setTime(_time, TIME_ARRAY_LENGTH);
+		set12Hour();
+	}
+	else
+	{
+		status = setTime(_time, TIME_ARRAY_LENGTH);
+	}
+	return status;
 }
 
 // setTime -- Set time and date/day registers of RV1805 (using data array)
