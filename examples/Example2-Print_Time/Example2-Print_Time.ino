@@ -20,15 +20,6 @@
 
 RV1805 rtc;
 
-int hund = 50;
-int sec = 2;
-int minute = 18;
-int hour = 7;
-int date = 25;
-int month = 6;
-int year = 2018;
-int day = 5;
-
 void setup() {
 
   Wire.begin();
