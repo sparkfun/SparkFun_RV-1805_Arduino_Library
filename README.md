@@ -1,11 +1,15 @@
 RTC RV-3028-C7 Arduino Library
 ========================================
 
+```diff
+- this repository is still in work!
+
 ![Real Time Clock ](https://www.mouser.de/images/microcrystal/images/RV-3028-C7_series_t.jpg)
 
 [*Application Manual*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf)
 
 The RV-3028-C7 is an extremely precise, extremely low power, highly configurable RTC. Under ideal conditions it runs at approximately 40nA with +/-5ppm per year of deviation (+/- 160 seconds worst case per year).
+This RV-3028-C7 library was originally forked from the [Sparkfun RV-1805 library](https://github.com/sparkfun/SparkFun_RV-1805_Arduino_Library)
 
 This library allows the user to:
 
