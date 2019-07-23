@@ -3,6 +3,7 @@ RTC RV-3028-C7 Arduino Library
 
 ```diff
 - this repository is still in work!
+```
 
 ![Real Time Clock ](https://www.mouser.de/images/microcrystal/images/RV-3028-C7_series_t.jpg)
 
