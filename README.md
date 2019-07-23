@@ -1,11 +1,11 @@
-SparkFun Qwiic RTC RV-1805 Arduino Library
+RTC RV-3028-C7 Arduino Library
 ========================================
 
-![Real Time Clock Module](https://cdn.sparkfun.com/r/500-500/assets/parts/1/2/6/9/1/14558-SparkFun_Real_Time_Clock_Module_-_RV-1805__Qwiic_-01.jpg)
+![Real Time Clock ](https://www.mouser.de/images/microcrystal/lrg/RV-3028-C7_series_t.jpg)
 
-[*Qwiic RV-1805 RTC Module (BOB-14558)*](https://www.sparkfun.com/products/14558)
+[*Application Manual*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf)
 
-The RV-1805 is an extremely precise, extremely low power, highly configurable RTC. Under ideal conditions it runs at approximately 22nA with +/-6ppm per year of deviation (+/- 192 seconds worst case per year).
+The RV-3028-C7 is an extremely precise, extremely low power, highly configurable RTC. Under ideal conditions it runs at approximately 40nA with +/-5ppm per year of deviation (+/- 160 seconds worst case per year).
 
 This library allows the user to:
 
@@ -26,12 +26,7 @@ Repository Contents
 Documentation
 --------------
 * **[Installing an Arduino Library Guide](https://learn.sparkfun.com/tutorials/installing-an-arduino-library)** - Basic information on how to install an Arduino library.
-* **[Product Repository](https://github.com/sparkfun/Qwiic_RTC_Module)** - Main repository (including hardware files) for the SparkFun Qwiic RTC Breakout.
-
-Products That Use This Library 
----------------------------------
-* [BOB-14558](https://www.sparkfun.com/products/14558) - SparkFun red version
-* [SPX-14642](https://www.sparkfun.com/products/14642) - SparkX version
+* **[Main Repository](https://github.com/constiko/RV-3028_C7-Arduino_Library)** - Main repository for the RV-3028-C7 Arduino library
 
 License Information
 -------------------
@@ -40,10 +35,6 @@ This product is _**open source**_!
 
 Please review the LICENSE.md file for license information. 
 
-If you have any questions or concerns on licensing, please contact techsupport@sparkfun.com.
-
-Please use, reuse, and modify these files as you see fit. Please maintain attribution to SparkFun Electronics and release any derivative under the same license.
+If you have any questions or concerns on licensing, please contact constantinkoch@outlook.com.
 
 Distributed as-is; no warranty is given.
-
-- Your friends at SparkFun.
