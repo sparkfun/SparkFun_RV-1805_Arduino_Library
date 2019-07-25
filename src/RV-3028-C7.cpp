@@ -1,20 +1,20 @@
 /******************************************************************************
-SparkFun_RV1805.h
-RV1805 Arduino Library
-Andy England @ SparkFun Electronics
-February 5, 2018
-https://github.com/sparkfun/Qwiic_RTC
+RV-3028-C7.h
+RV-3028-C7 Arduino Library
+Constantin Koch
+July 25, 2019
+https://github.com/constiko/RV-3028_C7-Arduino_Library
 
 Development environment specifics:
 Arduino IDE 1.6.4
 
 This code is released under the [MIT License](http://opensource.org/licenses/MIT).
 Please review the LICENSE.md file included with this example. If you have any questions
-or concerns with licensing, please contact techsupport@sparkfun.com.
+or concerns with licensing, please contact constantinkoch@outlook.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#include "SparkFun_RV1805.h"
+#include "RV-3028-C7.h"
 
 //****************************************************************************//
 //
