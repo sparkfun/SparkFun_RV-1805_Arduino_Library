@@ -6,7 +6,7 @@ July 25, 2019
 https://github.com/constiko/RV-3028_C7-Arduino_Library
 
 Resources:
-Uses Wire.h for i2c operation
+Uses Wire.h for I2C operation
 Uses SPI.h for SPI operation
 
 Development environment specifics:
@@ -28,16 +28,16 @@ Distributed as-is; no warranty is given.
 
 #include <Wire.h>
 
-//The 7-bit I2C address of the RV1805
-#define RV1805_ADDR						(uint8_t)0x69
+//The 7-bit I2C address of the RV3028
+#define RV3028_ADDR						(uint8_t)0x52//###
 
 //The upper part of the part number is always 0x18
-#define RV1805_PART_NUMBER_UPPER		0x18
+//#define RV3028_PART_NUMBER_UPPER		0x18		//at RV-3028, Register 0x28 (ID) is not always constant
 
 //Possible CONFKEY Values
-#define RV1805_CONF_RST					0x3C //value written to Configuration Key for reset
-#define RV1805_CONF_OSC					0xA1 //value written to Configuration Key for oscillator control register write enable
-#define RV1805_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
+#define RV3028_CONF_RST					0x3C //value written to Configuration Key for reset
+#define RV3028_CONF_OSC					0xA1 //value written to Configuration Key for oscillator control register write enable
+#define RV3028_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
 
 //Bits in Control1 Register
 #define CTRL1_STOP	7
@@ -102,46 +102,70 @@ Distributed as-is; no warranty is given.
 #define ONE_EIGHT						0xD0
 #define ONE_FOUR						0xF0
 
-//Register names:
-#define RV1805_HUNDREDTHS               0x00
-#define RV1805_SECONDS      			0x01
-#define RV1805_MINUTES      			0x02
-#define RV1805_HOURS        			0x03
-#define RV1805_DATE         			0x04
-#define RV1805_MONTHS        			0x05
-#define RV1805_YEARS        			0x06
-#define RV1805_WEEKDAYS      			0x07
-#define RV1805_HUNDREDTHS_ALM           0x08
-#define RV1805_SECONDS_ALM    			0x09
-#define RV1805_MINUTES_ALM     			0x0A
-#define RV1805_HOURS_ALM       			0x0B
-#define RV1805_DATE_ALM        			0x0C
-#define RV1805_MONTHS_ALM      			0x0D
-#define RV1805_WEEKDAYS_ALM    			0x0E
-#define RV1805_STATUS					0x0F
-#define RV1805_CTRL1					0x10
-#define RV1805_CTRL2					0x11
-#define RV1805_INT_MASK					0x12
-#define RV1805_SQW						0x13
-#define RV1805_CAL_XT					0x14
-#define RV1805_CAL_RC_UP				0x15
-#define RV1805_CAL_RC_LO				0x16
-#define RV1805_SLP_CTRL					0x17
-#define RV1805_CTDWN_TMR_CTRL			0x18
-#define RV1805_CTDWN_TMR				0x19
-#define RV1805_TMR_INITIAL				0x1A
-#define RV1805_WATCHDOG_TMR				0x1B
-#define RV1805_OSC_CTRL					0x1C
-#define RV1805_OSC_STATUS				0x1D
-#define RV1805_CONF_KEY					0x1F
-#define RV1805_TRICKLE_CHRG				0x20
-#define RV1805_BREF_CTRL				0x21
-#define RV1805_CAP_RC					0x26
-#define RV1805_IOBATMODE				0x27
-#define RV1805_ID0						0x28
-#define RV1805_ANLG_STAT				0x2F
-#define RV1805_OUT_CTRL					0x30
-#define RV1805_RAM_EXT					0x3F
+//REGISTERS
+//Clock registers
+#define RV3028_SECONDS      			0x00//###
+#define RV3028_MINUTES      			0x01//###
+#define RV3028_HOURS        			0x02//###
+//Calendar registers
+#define RV3028_WEEKDAY					0x03//###
+#define RV3028_DATE         			0x04//###
+#define RV3028_MONTHS        			0x05//###
+#define RV3028_YEARS        			0x06//###
+
+//Alarm registers
+#define RV3028_MINUTES_ALM     			0x07//###
+#define RV3028_HOURS_ALM       			0x08//###
+#define RV3028_DATE_ALM        			0x09//###
+
+//Periodic Countdown Timer registers
+#define RV3028_TIMERVAL_0				0x0A//###
+#define RV3028_TIMERVAL_1				0x0B//###
+#define RV3028_TIMERSTAT_0				0x0C//###
+#define RV3028_TIMERSTAT_1				0x0D//###
+
+//Configuration registers
+#define RV3028_STATUS					0x0E//###
+#define RV3028_CTRL1					0x0F//###
+#define RV3028_CTRL2					0x10//###
+#define RV3028_GPBITS					0x11//###
+#define RV3028_INT_MASK					0x12//###
+
+//Eventcontrol/Timestamp registers
+#define RV3028_EVENTCTRL				0x13//###
+#define RV3028_COUNT_TS					0x14//###
+#define RV3028_SECONDS_TS				0x15//###
+#define RV3028_MINUTES_TS				0x16//###
+#define RV3028_HOURS_TS					0x17//###
+#define RV3028_DATE_TS					0x18//###
+#define RV3028_MONTH_TS					0x19//###
+#define RV3028_YEAR_TS					0x1A//###
+
+//Unix Time registers
+#define RV3028_UNIX_TIME0				0x1B//###
+#define RV3028_UNIX_TIME1				0x1C//###
+#define RV3028_UNIX_TIME2				0x1D//###
+#define RV3028_UNIX_TIME3				0x1E//###
+
+//RAM registers
+#define RV3028_USER_RAM1				0x1F//###
+#define RV3028_USER_RAM2				0x20//###
+
+//Password registers
+#define RV3028_PASSWORD0				0x21//###
+#define RV3028_PASSWORD1				0x22//###
+#define RV3028_PASSWORD2				0x23//###
+#define RV3028_PASSWORD3				0x24//###
+
+//EEPROM Memory Control registers
+#define RV3028_EEPROM_ADDR				0x25//###
+#define RV3028_EEPROM_DATA				0x26//###
+#define RV3028_EEPROM_CMD				0x27//###
+
+//ID register
+#define RV3028_ID						0x28//###
+
+
 
 #define TIME_ARRAY_LENGTH 8 // Total number of writable values in device
 
@@ -156,11 +180,11 @@ enum time_order {
 	TIME_DAY,	     // 7
 };
 
-class RV1805
+class RV3028
 {
   public:
 	
-    RV1805( void );
+    RV3028( void );
 
     boolean begin( TwoWire &wirePort = Wire);
 
