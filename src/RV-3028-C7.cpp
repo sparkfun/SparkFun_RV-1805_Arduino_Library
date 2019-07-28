@@ -24,7 +24,7 @@ Distributed as-is; no warranty is given.
 
 // Parse the __DATE__ predefined macro to generate date defaults:
 // __Date__ Format: MMM DD YYYY (First D may be a space if <10)
-// <MONTH>
+// <MONTH>																	//###
 #define BUILD_MONTH_JAN ((__DATE__[0] == 'J') && (__DATE__[1] == 'a')) ? 1 : 0
 #define BUILD_MONTH_FEB (__DATE__[0] == 'F') ? 2 : 0
 #define BUILD_MONTH_MAR ((__DATE__[0] == 'M') && (__DATE__[1] == 'a') && (__DATE__[2] == 'r')) ? 3 : 0
@@ -41,30 +41,30 @@ Distributed as-is; no warranty is given.
 BUILD_MONTH_APR | BUILD_MONTH_MAY | BUILD_MONTH_JUN | \
 BUILD_MONTH_JUL | BUILD_MONTH_AUG | BUILD_MONTH_SEP | \
 BUILD_MONTH_OCT | BUILD_MONTH_NOV | BUILD_MONTH_DEC
-// <DATE>
+// <DATE>																	//###
 #define BUILD_DATE_0 ((__DATE__[4] == ' ') ? 0 : (__DATE__[4] - 0x30))
 #define BUILD_DATE_1 (__DATE__[5] - 0x30)
 #define BUILD_DATE ((BUILD_DATE_0 * 10) + BUILD_DATE_1)
-// <YEAR>
+// <YEAR>																	//###
 #define BUILD_YEAR (((__DATE__[7] - 0x30) * 1000) + ((__DATE__[8] - 0x30) * 100) + \
 ((__DATE__[9] - 0x30) * 10)  + ((__DATE__[10] - 0x30) * 1))
 
 // Parse the __TIME__ predefined macro to generate time defaults:
 // __TIME__ Format: HH:MM:SS (First number of each is padded by 0 if <10)
-// <HOUR>
+// <HOUR>																	//###
 #define BUILD_HOUR_0 ((__TIME__[0] == ' ') ? 0 : (__TIME__[0] - 0x30))
 #define BUILD_HOUR_1 (__TIME__[1] - 0x30)
 #define BUILD_HOUR ((BUILD_HOUR_0 * 10) + BUILD_HOUR_1)
-// <MINUTE>
+// <MINUTE>																	//###
 #define BUILD_MINUTE_0 ((__TIME__[3] == ' ') ? 0 : (__TIME__[3] - 0x30))
 #define BUILD_MINUTE_1 (__TIME__[4] - 0x30)
 #define BUILD_MINUTE ((BUILD_MINUTE_0 * 10) + BUILD_MINUTE_1)
-// <SECOND>
+// <SECOND>																	//###
 #define BUILD_SECOND_0 ((__TIME__[6] == ' ') ? 0 : (__TIME__[6] - 0x30))
 #define BUILD_SECOND_1 (__TIME__[7] - 0x30)
 #define BUILD_SECOND ((BUILD_SECOND_0 * 10) + BUILD_SECOND_1)
 
-RV3028::RV3028( void )
+RV3028::RV3028( void )//###
 {
 
 }
@@ -269,12 +269,6 @@ bool RV3028::setTime(uint8_t * time, uint8_t len)
 	return writeMultipleRegisters(RV3028_HUNDREDTHS, time, len);
 }
 
-bool RV3028::setHundredths(uint8_t value)
-{
-	_time[TIME_HUNDREDTHS] = DECtoBCD(value);
-	return setTime(_time, TIME_ARRAY_LENGTH);
-}
-
 bool RV3028::setSeconds(uint8_t value)
 {
 	_time[TIME_SECONDS] = DECtoBCD(value);
@@ -328,11 +322,6 @@ bool RV3028::updateTime()
 	if(is12Hour()) _time[TIME_HOURS] &= ~(1<<HOURS_AM_PM); //Remove this bit from value
 	
 	return true;
-}
-
-uint8_t RV3028::getHundredths()
-{
-	return BCDtoDEC(_time[TIME_HUNDREDTHS]);
 }
 
 uint8_t RV3028::getSeconds()
@@ -415,6 +404,7 @@ bool RV3028::setToCompilerTime()
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
+/*
 bool RV3028::setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month)
 {
 	uint8_t alarmTime[TIME_ARRAY_LENGTH];
@@ -475,7 +465,7 @@ void RV3028::setStaticPowerSwitchOutput(bool psw)
     writeRegister(RV3028_CTRL1, value);
 }
 
-
+*/
 /*********************************
 Given a bit location, enable the interrupt
 INTERRUPT_BLIE	4
@@ -483,6 +473,7 @@ INTERRUPT_TIE	3
 INTERRUPT_AIE	2
 INTERRUPT_EIE	1
 *********************************/
+/*
 void RV3028::enableInterrupt(uint8_t source)
 {
 	uint8_t value = readRegister(RV3028_INT_MASK);
@@ -496,7 +487,7 @@ void RV3028::disableInterrupt(uint8_t source)
 	value &= ~(1<<source); //Clear the interrupt enable bit
 	writeRegister(RV3028_INT_MASK, value);
 }
-
+*/
 /********************************
 Set Alarm Mode controls which parts of the time have to match for the alarm to trigger.
 When the RTC matches a given time, make an interrupt fire.
@@ -515,6 +506,7 @@ Alarm is triggered when listed characteristics match:
 	0x08: 0xF0-0xF9 Once per tenth (10 Hz)
 	0x08: 0xFF Once per hundredth (100 Hz)
 ********************************/
+/*
 void RV3028::setAlarmMode(uint8_t mode)
 {
 	if (mode > 0b111) mode = 0b111; //0 to 7 is valid
@@ -581,7 +573,7 @@ void RV3028::enableLowPower()
 	//Autocalibrate every 512 seconds to get to 22nA mode
 	//Switch to RC Oscillator when powered by VBackup
 }
-
+*/
 /*******************************************
 Enable Battery Interrupt
 
@@ -601,6 +593,7 @@ edgeTrigger = TRUE; Rising Voltage
 2: 2.2V
 3: 1.6V
 *******************************************/
+/*
 void RV3028::enableBatteryInterrupt(uint8_t voltage, bool edgeTrigger)
 {
 	setEdgeTrigger(edgeTrigger);
@@ -649,24 +642,25 @@ void RV3028::setEdgeTrigger(bool edgeTrigger)
 	value |= (edgeTrigger << 6);
 	writeRegister(RV3028_RAM_EXT, value);
 }
+*/
 
 void RV3028::clearInterrupts() //Read the status register to clear the current interrupt flags
 {
 	status();
 }
 
-uint8_t RV3028::BCDtoDEC(uint8_t val)
+uint8_t RV3028::BCDtoDEC(uint8_t val)//###
 {
 	return ( ( val / 0x10) * 10 ) + ( val % 0x10 );
 }
 
 // BCDtoDEC -- convert decimal to binary-coded decimal (BCD)
-uint8_t RV3028::DECtoBCD(uint8_t val)
+uint8_t RV3028::DECtoBCD(uint8_t val)//###
 {
 	return ( ( val / 10 ) * 0x10 ) + ( val % 10 );
 }
 
-uint8_t RV3028::readRegister(uint8_t addr)
+uint8_t RV3028::readRegister(uint8_t addr)//###
 {
 	_i2cPort->beginTransmission(RV3028_ADDR);
 	_i2cPort->write(addr);
@@ -681,7 +675,7 @@ uint8_t RV3028::readRegister(uint8_t addr)
 	}
 }
 
-bool RV3028::writeRegister(uint8_t addr, uint8_t val)
+bool RV3028::writeRegister(uint8_t addr, uint8_t val)//###
 {
 	_i2cPort->beginTransmission(RV3028_ADDR);
 	_i2cPort->write(addr);
@@ -691,7 +685,7 @@ bool RV3028::writeRegister(uint8_t addr, uint8_t val)
 	return(true);
 }
 
-bool RV3028::writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len)
+bool RV3028::writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len)//###
 {
 	_i2cPort->beginTransmission(RV3028_ADDR);
 	_i2cPort->write(addr);
@@ -705,7 +699,7 @@ bool RV3028::writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len)
 	return(true);
 }
 
-bool RV3028::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)
+bool RV3028::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)//###
 {
 	_i2cPort->beginTransmission(RV3028_ADDR);
 	_i2cPort->write(addr);
