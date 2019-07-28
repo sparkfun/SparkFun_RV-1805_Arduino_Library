@@ -40,12 +40,14 @@ Distributed as-is; no warranty is given.
 
 //Bits in Control1 Register
 #define CTRL1_STOP	7
-#define CTRL1_12_24	6
 #define CTRL1_PSWB	5
 #define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
 
+//Bits in Control2 Register
+#define CTRL2_12_24 1//###
+
 //Bits in Hours register
-#define HOURS_AM_PM						5
+#define HOURS_AM_PM						5//###
 
 //Trickle Charge Control//XXX
 #define TRICKLE_CHARGER_TCS_OFFSET				4//XXX
@@ -175,10 +177,10 @@ enum time_order {		//###
 	TIME_SECONDS,    // 0
 	TIME_MINUTES,    // 1
 	TIME_HOURS,      // 2
-	TIME_DATE,       // 3
-	TIME_MONTH,      // 4
-	TIME_YEAR,       // 5
-	TIME_DAY,	     // 6
+	TIME_WEEKDAY,    // 3
+	TIME_DATE,       // 4
+	TIME_MONTH,      // 5
+	TIME_YEAR,       // 6
 };
 
 class RV3028
@@ -189,7 +191,7 @@ public:
 
 	boolean begin(TwoWire &wirePort = Wire);//###
 
-	bool setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint16_t year, uint8_t day);//###
+	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);//###
 	bool setTime(uint8_t * time, uint8_t len);//###
 	bool setSeconds(uint8_t value);//###
 	bool setMinutes(uint8_t value);//###
@@ -254,8 +256,6 @@ public:
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
 	uint8_t BCDtoDEC(uint8_t val);//### 
 	uint8_t DECtoBCD(uint8_t val);//###
-
-	void reset(void); //Fully reset RTC to all zeroes//###
 
 	uint8_t readRegister(uint8_t addr);//###
 	bool writeRegister(uint8_t addr, uint8_t val);//###
