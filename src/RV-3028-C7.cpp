@@ -93,7 +93,7 @@ void RV3028::set12Hour()//###
 		//Set the 12/24 hour bit
 		uint8_t setting = readRegister(RV3028_CTRL2);
 		setting |= (1 << CTRL2_12_24);
-		writeRegister(RV3028_CTRL1, setting);
+		writeRegister(RV3028_CTRL2, setting);
 
 		//Take the current hours and convert to 12, complete with AM/PM bit
 		boolean pm = false;
@@ -210,9 +210,17 @@ char* RV3028::stringTime()//###
 
 char* RV3028::stringTimeStamp()//###
 {
-	static char timeStamp[23]; //Max of yyyy-mm-ddThh:mm:ss.ss with \0 terminator
+	static char timeStamp[25]; //Max of yyyy-mm-ddThh:mm:ss.ss with \0 terminator
 
-	sprintf(timeStamp, "20%02d-%02d-%02dT%02d:%02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), BCDtoDEC(_time[TIME_HUNDREDTHS]));
+	if (is12Hour() == true)
+	{
+		char half = 'A';
+		if (isPM()) half = 'P';
+
+		sprintf(timeStamp, "20%02d-%02d-%02d  %02d:%02d:%02d%cM", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]), half);
+	}
+	else
+		sprintf(timeStamp, "20%02d-%02d-%02d  %02d:%02d:%02d", BCDtoDEC(_time[TIME_YEAR]), BCDtoDEC(_time[TIME_MONTH]), BCDtoDEC(_time[TIME_DATE]), BCDtoDEC(_time[TIME_HOURS]), BCDtoDEC(_time[TIME_MINUTES]), BCDtoDEC(_time[TIME_SECONDS]));
 
 	return(timeStamp);
 }
@@ -288,9 +296,9 @@ bool RV3028::setMonth(uint8_t value)//###
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
-bool RV3028::setYear(uint8_t value)//###
+bool RV3028::setYear(uint16_t value)//###
 {
-	_time[TIME_YEAR] = DECtoBCD(value);
+	_time[TIME_YEAR] = DECtoBCD(value - 2000);
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
@@ -337,9 +345,9 @@ uint8_t RV3028::getMonth()//###
 	return BCDtoDEC(_time[TIME_MONTH]);
 }
 
-uint8_t RV3028::getYear()//###
+uint16_t RV3028::getYear()//###
 {
-	return BCDtoDEC(_time[TIME_YEAR]);
+	return BCDtoDEC(_time[TIME_YEAR]) + 2000;
 }
 
 //Takes the time from the last build and uses it as the current time
@@ -652,7 +660,7 @@ uint8_t RV3028::readRegister(uint8_t addr)//###
 
 	_i2cPort->requestFrom(RV3028_ADDR, (uint8_t)1);
 	if (_i2cPort->available()) {
-		uint8_t zws = _i2cPort->read());
+		uint8_t zws = _i2cPort->read();
 
 		//clear status register when it was read
 		if (addr == RV3028_STATUS) writeRegister(addr, 0);

@@ -28,8 +28,11 @@ Distributed as-is; no warranty is given.
 
 #include <Wire.h>
 
+//###    = reviewed
+//###### = tested
+
 //The 7-bit I2C address of the RV3028
-#define RV3028_ADDR						(uint8_t)0x52//###
+#define RV3028_ADDR						(uint8_t)0x52//######
 
 //START BRAUCHE ICH DAS NOCH????
 
@@ -108,14 +111,14 @@ Distributed as-is; no warranty is given.
 
 //REGISTERS
 //Clock registers
-#define RV3028_SECONDS      			0x00//###
-#define RV3028_MINUTES      			0x01//###
-#define RV3028_HOURS        			0x02//###
+#define RV3028_SECONDS      			0x00//######
+#define RV3028_MINUTES      			0x01//######
+#define RV3028_HOURS        			0x02//######
 //Calendar registers
-#define RV3028_WEEKDAY					0x03//###
-#define RV3028_DATE         			0x04//###
-#define RV3028_MONTHS        			0x05//###
-#define RV3028_YEARS        			0x06//###
+#define RV3028_WEEKDAY					0x03//######
+#define RV3028_DATE         			0x04//######
+#define RV3028_MONTHS        			0x05//######
+#define RV3028_YEARS        			0x06//######
 
 //Alarm registers
 #define RV3028_MINUTES_ALM     			0x07//###
@@ -171,9 +174,9 @@ Distributed as-is; no warranty is given.
 
 
 
-#define TIME_ARRAY_LENGTH 7 // Total number of writable values in device//###
+#define TIME_ARRAY_LENGTH 7 // Total number of writable values in device//######
 
-enum time_order {		//###
+enum time_order {		//######
 	TIME_SECONDS,    // 0
 	TIME_MINUTES,    // 1
 	TIME_HOURS,      // 2
@@ -187,43 +190,43 @@ class RV3028
 {
 public:
 
-	RV3028(void);//###
+	RV3028(void);//######
 
-	boolean begin(TwoWire &wirePort = Wire);//###
+	boolean begin(TwoWire &wirePort = Wire);//######
 
-	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);//###
-	bool setTime(uint8_t * time, uint8_t len);//###
-	bool setSeconds(uint8_t value);//###
-	bool setMinutes(uint8_t value);//###
-	bool setHours(uint8_t value);//###
-	bool setWeekday(uint8_t value);//###
-	bool setDate(uint8_t value);//###
-	bool setMonth(uint8_t value);//###
-	bool setYear(uint8_t value);//###
+	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);//######
+	bool setTime(uint8_t * time, uint8_t len);//######
+	bool setSeconds(uint8_t value);//######
+	bool setMinutes(uint8_t value);//######
+	bool setHours(uint8_t value);//######
+	bool setWeekday(uint8_t value);//######
+	bool setDate(uint8_t value);//######
+	bool setMonth(uint8_t value);//######
+	bool setYear(uint16_t value);//######
 
-	bool updateTime(); //Update the local array with the RTC registers//###
+	bool updateTime(); //Update the local array with the RTC registers//######
 
-	char* stringDateUSA(); //Return date in mm-dd-yyyy//###
-	char* stringDate(); //Return date in dd-mm-yyyy//###
-	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode//###
-	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss//###
+	char* stringDateUSA(); //Return date in mm-dd-yyyy//######
+	char* stringDate(); //Return date in dd-mm-yyyy//######
+	char* stringTime(); //Return time hh:mm:ss with AM/PM if in 12 hour mode//######
+	char* stringTimeStamp(); //Return timeStamp in ISO 8601 format yyyy-mm-ddThh:mm:ss//######
 
-	uint8_t getSeconds();//###
-	uint8_t getMinutes();//###
-	uint8_t getHours();//###
-	uint8_t getWeekday();//###
-	uint8_t getDate();//###
-	uint8_t getMonth();//###
-	uint8_t getYear();	//###
+	uint8_t getSeconds();//######
+	uint8_t getMinutes();//######
+	uint8_t getHours();//######
+	uint8_t getWeekday();//######
+	uint8_t getDate();//######
+	uint8_t getMonth();//######
+	uint16_t getYear();	//######
 
-	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC//###
+	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC//######
 
-	bool is12Hour(); //Returns true if 12hour bit is set//###
-	bool isPM(); //Returns true if is12Hour and PM bit is set//###
-	void set12Hour();//###
-	void set24Hour();//###
+	bool is12Hour(); //Returns true if 12hour bit is set//######
+	bool isPM(); //Returns true if is12Hour and PM bit is set//######
+	void set12Hour();//######
+	void set24Hour();//######
 
-	uint8_t status(); //Returns the status byte//###
+	uint8_t status(); //Returns the status byte//######
 
 	/*
 	bool setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
@@ -251,18 +254,18 @@ public:
 	void setReferenceVoltage(uint8_t voltage);
 	*/
 
-	void clearInterrupts();
+	void clearInterrupts(); //######
 
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
-	uint8_t BCDtoDEC(uint8_t val);//### 
-	uint8_t DECtoBCD(uint8_t val);//###
+	uint8_t BCDtoDEC(uint8_t val);//###### 
+	uint8_t DECtoBCD(uint8_t val);//######
 
-	uint8_t readRegister(uint8_t addr);//###
-	bool writeRegister(uint8_t addr, uint8_t val);//###
-	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);//###
-	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);//###
+	uint8_t readRegister(uint8_t addr);//######
+	bool writeRegister(uint8_t addr, uint8_t val);//######
+	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);//######
+	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);//######
 
-private:	//###
+private:	//######
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	TwoWire *_i2cPort;
 };
