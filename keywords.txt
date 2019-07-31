@@ -55,6 +55,8 @@ enableBatteryInterrupt	KEYWORD2
 enableAlarmInterrupt	KEYWORD2
 
 setEdgeTrigger	KEYWORD2
+
+setBackupSwitchoverMode	KEYWORD2
 clearInterrupts	KEYWORD2
 checkBattery	KEYWORD2
 setReferenceVoltage	KEYWORD2
@@ -66,6 +68,10 @@ readRegister	KEYWORD2
 writeRegister	KEYWORD2
 readMultipleRegisters	KEYWORD2
 writeMultipleRegisters	KEYWORD2
+
+writeConfigEEPROM_RAMmirror	KEYWORD2
+readConfigEEPROM_RAMmirror	KEYWORD2
+waitforEEPROM	KEYWORD2
 
 ###################################################################
 # Constants

@@ -78,7 +78,7 @@ boolean RV3028::begin(TwoWire &wirePort)//###
 
 	set24Hour();
 
-	return(true);
+	return(setBackupSwitchoverMode(3) && writeRegister(RV3028_STATUS, 0x00));
 }
 
 //Configure RTC to output 1-12 hours
@@ -636,6 +636,24 @@ void RV3028::setEdgeTrigger(bool edgeTrigger)
 }
 */
 
+bool RV3028::setBackupSwitchoverMode(uint8_t val)//###
+{
+	bool success = true;
+
+	//Read EEPROM Backup Register (0x37)
+	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Backup_Register);
+	if (EEPROMBackup == 0xFF) success = false;
+	//Ensure FEDE Bit is set to 1
+	EEPROMBackup |= 1 << EEPROMBackup_FEDE_BIT;
+	//Set BSM Bits (Backup Switchover Mode)
+	EEPROMBackup &= EEPROMBackup_BSM_CLEAR;		//Clear BSM Bits of EEPROM Backup Register
+	EEPROMBackup |= val << EEPROMBackup_BSM_SHIFT;	//Shift values into EEPROM Backup Register
+	//Write EEPROM Backup Register
+	if (!writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup)) success = false;
+
+	return success;
+}
+
 void RV3028::clearInterrupts()//### //Read the status register to clear the current interrupt flags
 {
 	status();
@@ -710,4 +728,62 @@ bool RV3028::readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len)//#
 	}
 
 	return(true);
+}
+
+bool RV3028::writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val)//###
+{
+	bool success = waitforEEPROM();
+
+	//Disable auto refresh by writing 1 to EERD control bit in CTRL1 register
+	uint8_t ctrl1 = readRegister(RV3028_CTRL1);
+	ctrl1 |= 1 << CTRL1_EERD;
+	if (!writeRegister(RV3028_CTRL1, ctrl1)) success = false;
+	//Write Configuration RAM Register
+	writeRegister(eepromaddr, val);
+	//Update EEPROM (All Configuration RAM -> EEPROM)
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_First);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_Update);
+	if (!waitforEEPROM()) success = false;
+	//Reenable auto refresh by writing 0 to EERD control bit in CTRL1 register
+	ctrl1 = readRegister(RV3028_CTRL1);
+	if (ctrl1 == 0x00)success = false;
+	ctrl1 &= ~(1 << CTRL1_EERD);
+	writeRegister(RV3028_CTRL1, ctrl1);
+	if (!waitforEEPROM()) success = false;
+
+	return success;
+}
+
+uint8_t RV3028::readConfigEEPROM_RAMmirror(uint8_t eepromaddr)//###
+{
+	bool success = waitforEEPROM();
+
+	//Disable auto refresh by writing 1 to EERD control bit in CTRL1 register
+	uint8_t ctrl1 = readRegister(RV3028_CTRL1);
+	ctrl1 |= 1 << CTRL1_EERD;
+	if (!writeRegister(RV3028_CTRL1, ctrl1)) success = false;
+	//Read EEPROM Register
+	writeRegister(RV3028_EEPROM_ADDR, eepromaddr);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_First);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_ReadSingle);
+	if (!waitforEEPROM()) success = false;
+	uint8_t eepromdata = readRegister(RV3028_EEPROM_DATA);
+	if (!waitforEEPROM()) success = false;
+	//Reenable auto refresh by writing 0 to EERD control bit in CTRL1 register
+	ctrl1 = readRegister(RV3028_CTRL1);
+	if (ctrl1 == 0x00)success = false;
+	ctrl1 &= ~(1 << CTRL1_EERD);
+	writeRegister(RV3028_CTRL1, ctrl1);
+
+	if (!success) return 0xFF;
+	return eepromdata;
+}
+
+//True if success, false if timeout occured
+bool RV3028::waitforEEPROM()//###
+{
+	unsigned long timeout = millis() + 500;
+	while ((readRegister(RV3028_STATUS) & 1 << STATUS_EEBUSY) && millis() < timeout);
+
+	return millis() < timeout;
 }

@@ -45,6 +45,7 @@ Distributed as-is; no warranty is given.
 #define CTRL1_STOP	7
 #define CTRL1_PSWB	5
 #define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
+#define CTRL1_EERD	3//###
 
 //Bits in Control2 Register
 #define CTRL2_12_24 1//###
@@ -109,6 +110,14 @@ Distributed as-is; no warranty is given.
 
 //END BRAUCHE ICH DAS NOCH????
 
+//Bits in EEPROM Commands (0x27)
+#define EEPROMCMD_First					0x00//###
+#define EEPROMCMD_Update				0x11//###
+#define EEPROMCMD_Refresh				0x12//###
+#define EEPROMCMD_WriteSingle			0x21//###
+#define EEPROMCMD_ReadSingle			0x22//###
+
+
 //REGISTERS
 //Clock registers
 #define RV3028_SECONDS      			0x00//######
@@ -172,7 +181,13 @@ Distributed as-is; no warranty is given.
 //ID register
 #define RV3028_ID						0x28//###
 
+//EEPROM Registers
+#define EEPROM_Backup_Register			0x37//###
 
+//Bits in EEPROM Registers
+#define EEPROMBackup_FEDE_BIT			0x04		//###
+#define EEPROMBackup_BSM_CLEAR			0b11110011	//###
+#define EEPROMBackup_BSM_SHIFT			2			//###
 
 #define TIME_ARRAY_LENGTH 7 // Total number of writable values in device//######
 
@@ -254,6 +269,12 @@ public:
 	void setReferenceVoltage(uint8_t voltage);
 	*/
 
+	//0 = Switchover disabled
+	//1 = Direct Switching Mode
+	//2 = Standby Mode
+	//3 = Level Switching Mode
+	bool setBackupSwitchoverMode(uint8_t val);//###
+
 	void clearInterrupts(); //######
 
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
@@ -264,6 +285,10 @@ public:
 	bool writeRegister(uint8_t addr, uint8_t val);//######
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);//######
 	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);//######
+	
+	bool writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val);//######
+	uint8_t readConfigEEPROM_RAMmirror(uint8_t eepromaddr);//######
+	bool waitforEEPROM();//######
 
 private:	//######
 	uint8_t _time[TIME_ARRAY_LENGTH];
