@@ -56,7 +56,10 @@ enableAlarmInterrupt	KEYWORD2
 
 setEdgeTrigger	KEYWORD2
 
+enableTrickleCharge	KEYWORD2
+disableTrickleCharge	KEYWORD2
 setBackupSwitchoverMode	KEYWORD2
+
 clearInterrupts	KEYWORD2
 checkBattery	KEYWORD2
 setReferenceVoltage	KEYWORD2

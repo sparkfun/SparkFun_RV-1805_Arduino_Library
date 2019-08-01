@@ -31,91 +31,8 @@ Distributed as-is; no warranty is given.
 //###    = reviewed
 //###### = tested
 
-//The 7-bit I2C address of the RV3028
+//The 7-bit I2C ADDRESS of the RV3028
 #define RV3028_ADDR						(uint8_t)0x52//######
-
-//START BRAUCHE ICH DAS NOCH????
-
-//Possible CONFKEY Values
-#define RV3028_CONF_RST					0x3C //value written to Configuration Key for reset
-#define RV3028_CONF_OSC					0xA1 //value written to Configuration Key for oscillator control register write enable
-#define RV3028_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
-
-//Bits in Control1 Register
-#define CTRL1_STOP	7
-#define CTRL1_PSWB	5
-#define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
-#define CTRL1_EERD	3//###
-
-//Bits in Control2 Register
-#define CTRL2_12_24 1//###
-
-//Bits in Hours register
-#define HOURS_AM_PM						5//###
-
-//Trickle Charge Control//XXX
-#define TRICKLE_CHARGER_TCS_OFFSET				4//XXX
-#define TRICKLE_CHARGER_DIODE_OFFSET			2//XXX
-#define TRICKLE_CHARGER_ROUT_OFFSET			0//XXX
-#define TRICKLE_ENABLE					0b1010//XXX
-#define TRICKLE_DISABLE					0b0000//XXX
-#define DIODE_DISABLE 					0b00//XXX
-#define DIODE_0_3V						0b01//XXX
-#define DIODE_0_6V						0b10//XXX
-#define ROUT_DISABLE					0b00//XXX
-#define ROUT_3K							0b01//XXX
-#define ROUT_6K							0b10//XXX
-#define ROUT_11K						0b11//XXX
-
-//Interrupt Enable Bits
-#define INTERRUPT_BLIE	4
-#define INTERRUPT_TIE	3
-#define INTERRUPT_AIE	2
-#define INTERRUPT_EIE	1
-
-
-//PSW Pin Function Selection Bits
-#define PSWS_OFFSET     2
-#define PSWS_INV_IRQ    0b000
-#define PSWS_SQW        0b001
-#define PSWS_INV_AIRQ   0b011
-#define PSWS_TIRQ       0b100
-#define PSWS_INV_TIRQ   0b101
-#define PSWS_SLEEP      0b110
-#define PSWS_STATIC     0b111
-
-//Countdown Timer Control
-#define COUNTDOWN_SECONDS		0b10
-#define COUNTDOWN_MINUTES		0b11
-#define CTDWN_TMR_TE_OFFSET		7
-#define CTDWN_TMR_TM_OFFSET		6
-#define CTDWN_TMR_TRPT_OFFSET	5
-
-
-//Status Bits
-#define STATUS_EEBUSY	7//###
-#define STATUS_CLKF 6//###
-#define STATUS_BSF 5//###
-#define STATUS_UF 4//###
-#define STATUS_TF 3//###
-#define STATUS_AF 2//###
-#define STATUS_EVF 1//###
-#define STATUS_PORF 0//###
-
-//Reference Voltage
-#define TWO_FIVE						0x70
-#define TWO_ONE							0xB0
-#define ONE_EIGHT						0xD0
-#define ONE_FOUR						0xF0
-
-//END BRAUCHE ICH DAS NOCH????
-
-//Bits in EEPROM Commands (0x27)
-#define EEPROMCMD_First					0x00//###
-#define EEPROMCMD_Update				0x11//###
-#define EEPROMCMD_Refresh				0x12//###
-#define EEPROMCMD_WriteSingle			0x21//###
-#define EEPROMCMD_ReadSingle			0x22//###
 
 
 //REGISTERS
@@ -174,20 +91,115 @@ Distributed as-is; no warranty is given.
 #define RV3028_PASSWORD3				0x24//###
 
 //EEPROM Memory Control registers
-#define RV3028_EEPROM_ADDR				0x25//###
-#define RV3028_EEPROM_DATA				0x26//###
-#define RV3028_EEPROM_CMD				0x27//###
+#define RV3028_EEPROM_ADDR				0x25//######
+#define RV3028_EEPROM_DATA				0x26//######
+#define RV3028_EEPROM_CMD				0x27//######
 
 //ID register
 #define RV3028_ID						0x28//###
 
 //EEPROM Registers
-#define EEPROM_Backup_Register			0x37//###
+#define EEPROM_Clkout_Register			0x35//###
+#define EEPROM_Backup_Register			0x37//######
 
-//Bits in EEPROM Registers
-#define EEPROMBackup_FEDE_BIT			0x04		//###
-#define EEPROMBackup_BSM_CLEAR			0b11110011	//###
-#define EEPROMBackup_BSM_SHIFT			2			//###
+
+//BITS IN IMPORTANT REGISTERS
+
+//Bits in Status Register
+#define STATUS_EEBUSY	7//######
+#define STATUS_CLKF		6//###
+#define STATUS_BSF		5//###
+#define STATUS_UF		4//###
+#define STATUS_TF		3//###
+#define STATUS_AF		2//###
+#define STATUS_EVF		1//###
+#define STATUS_PORF		0//###
+
+//Bits in Control1 Register
+#define CTRL1_TRPT		7//###
+#define CTRL1_WADA		5//###//Bit 6 not implemented
+#define CTRL1_USEL		4//###
+#define CTRL1_EERD		3//######
+#define CTRL1_TE		2//###
+#define	CTRL1_TD1		1//###
+#define CTRL1_TD0		0//###
+
+//Bits in Control2 Register
+#define CTRL2_TSE		7//###
+#define CTRL2_CLKIE		6//###
+#define CTRL2_UIE		5//###
+#define CTRL2_TIE		4//###
+#define CTRL2_AIE		3//###
+#define CTRL2_EIE		2//###
+#define CTRL2_12_24		1//######
+#define CTRL2_RESET		0//###
+
+//Bits in Hours register
+#define HOURS_AM_PM						5//######
+
+
+
+//START BRAUCHE ICH DAS NOCH????
+
+//Possible CONFKEY Values
+#define RV3028_CONF_RST					0x3C //value written to Configuration Key for reset
+#define RV3028_CONF_OSC					0xA1 //value written to Configuration Key for oscillator control register write enable
+#define RV3028_CONF_WRT					0x9D //value written to Configuration Key to enable write of trickle charge, BREF, CAPRC, IO Batmode, and Output Control Registers
+
+
+//Interrupt Enable Bits
+#define INTERRUPT_BLIE	4
+#define INTERRUPT_TIE	3
+#define INTERRUPT_AIE	2
+#define INTERRUPT_EIE	1
+
+
+//PSW Pin Function Selection Bits
+#define PSWS_OFFSET     2
+#define PSWS_INV_IRQ    0b000
+#define PSWS_SQW        0b001
+#define PSWS_INV_AIRQ   0b011
+#define PSWS_TIRQ       0b100
+#define PSWS_INV_TIRQ   0b101
+#define PSWS_SLEEP      0b110
+#define PSWS_STATIC     0b111
+
+//Countdown Timer Control
+#define COUNTDOWN_SECONDS		0b10
+#define COUNTDOWN_MINUTES		0b11
+#define CTDWN_TMR_TE_OFFSET		7
+#define CTDWN_TMR_TM_OFFSET		6
+#define CTDWN_TMR_TRPT_OFFSET	5
+
+//Reference Voltage
+#define TWO_FIVE						0x70
+#define TWO_ONE							0xB0
+#define ONE_EIGHT						0xD0
+#define ONE_FOUR						0xF0
+
+//END BRAUCHE ICH DAS NOCH????
+
+
+//Commands for EEPROM Command Register (0x27)
+#define EEPROMCMD_First					0x00//######
+#define EEPROMCMD_Update				0x11//######
+#define EEPROMCMD_Refresh				0x12//######
+#define EEPROMCMD_WriteSingle			0x21//######
+#define EEPROMCMD_ReadSingle			0x22//######
+
+//Bits in EEPROM Backup Register
+#define EEPROMBackup_TCE_BIT			5			//######	//Trickle Charge Enable Bit
+#define EEPROMBackup_FEDE_BIT			4			//######	//Fast Edge Detection Enable Bit (for Backup Switchover Mode)
+#define EEPROMBackup_BSM_SHIFT			2			//######	//Backup Switchover Mode shift
+#define EEPROMBackup_TCR_SHIFT			0			//######	//Trickle Charge Resistor shift
+
+#define EEPROMBackup_BSM_CLEAR			0b11110011	//######	//Backup Switchover Mode clear
+#define EEPROMBackup_TCR_CLEAR			0b11111100	//######		//Trickle Charge Resistor clear
+#define	TCR_1K							0b00		//######		//Trickle Charge Resistor 1kOhm
+#define	TCR_3K							0b01		//######		//Trickle Charge Resistor 3kOhm
+#define	TCR_6K							0b10		//######		//Trickle Charge Resistor 6kOhm
+#define	TCR_11K							0b11		//######		//Trickle Charge Resistor 11kOhm
+
 
 #define TIME_ARRAY_LENGTH 7 // Total number of writable values in device//######
 
@@ -255,8 +267,6 @@ public:
 
 	void setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat = true, bool pulse = true);
 
-	void enableTrickleCharge(uint8_t diode = DIODE_0_3V, uint8_t rOut = ROUT_3K); //Diode default 0.3V, rOut default 3k
-	void disableTrickleCharge();
 	void enableLowPower();
 
 	void enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
@@ -269,11 +279,14 @@ public:
 	void setReferenceVoltage(uint8_t voltage);
 	*/
 
+	void enableTrickleCharge(uint8_t tcr = TCR_11K);//###### //Trickle Charge Resistor default 11k
+	void disableTrickleCharge();//######
+
 	//0 = Switchover disabled
 	//1 = Direct Switching Mode
 	//2 = Standby Mode
 	//3 = Level Switching Mode
-	bool setBackupSwitchoverMode(uint8_t val);//###
+	bool setBackupSwitchoverMode(uint8_t val);//######
 
 	void clearInterrupts(); //######
 
@@ -285,7 +298,7 @@ public:
 	bool writeRegister(uint8_t addr, uint8_t val);//######
 	bool readMultipleRegisters(uint8_t addr, uint8_t * dest, uint8_t len);//######
 	bool writeMultipleRegisters(uint8_t addr, uint8_t * values, uint8_t len);//######
-	
+
 	bool writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val);//######
 	uint8_t readConfigEEPROM_RAMmirror(uint8_t eepromaddr);//######
 	bool waitforEEPROM();//######

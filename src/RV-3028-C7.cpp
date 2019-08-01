@@ -77,6 +77,7 @@ boolean RV3028::begin(TwoWire &wirePort)//###
 	_i2cPort = &wirePort;
 
 	set24Hour();
+	disableTrickleCharge();
 
 	return(setBackupSwitchoverMode(3) && writeRegister(RV3028_STATUS, 0x00));
 }
@@ -166,8 +167,7 @@ bool RV3028::isPM()//###
 	return(false);
 }
 
-//Returns the status byte. This likely clears the interrupts as well.
-//See .begin() for ARST bit setting
+//Returns the status byte
 uint8_t RV3028::status(void)//###
 {
 	return(readRegister(RV3028_STATUS));
@@ -636,8 +636,43 @@ void RV3028::setEdgeTrigger(bool edgeTrigger)
 }
 */
 
+//Enable the Trickle Charger and set the Trickle Charge series resistor (default is 11k)
+//TCR_1K  =  1kOhm
+//TCR_3K  =  3kOhm
+//TCR_6K  =  6kOhm
+//TCR_11K = 11kOhm	
+void RV3028::enableTrickleCharge(uint8_t tcr)//###
+{
+	if (tcr > 3) return;
+
+	//Read EEPROM Backup Register (0x37)
+	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Backup_Register);
+	//Set TCR Bits (Trickle Charge Resistor)
+	EEPROMBackup &= EEPROMBackup_TCR_CLEAR;		//Clear TCR Bits
+	EEPROMBackup |= tcr << EEPROMBackup_TCR_SHIFT;	//Shift values into EEPROM Backup Register
+	//Write 1 to TCE Bit
+	EEPROMBackup |= 1 << EEPROMBackup_TCE_BIT;
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup);
+}
+
+void RV3028::disableTrickleCharge()//###
+{
+	//Read EEPROM Backup Register (0x37)
+	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Backup_Register);
+	//Write 0 to TCE Bit
+	EEPROMBackup &= ~(1 << EEPROMBackup_TCE_BIT);
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup);
+}
+
+//0 = Switchover disabled
+//1 = Direct Switching Mode
+//2 = Standby Mode
+//3 = Level Switching Mode
 bool RV3028::setBackupSwitchoverMode(uint8_t val)//###
 {
+	if (val > 3)return false;
 	bool success = true;
 
 	//Read EEPROM Backup Register (0x37)
