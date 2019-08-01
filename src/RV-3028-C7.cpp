@@ -396,6 +396,27 @@ bool RV3028::setToCompilerTime()//###
 	return setTime(_time, TIME_ARRAY_LENGTH);
 }
 
+//ATTENTION: Real Time and UNIX Time are INDEPENDENT!
+bool RV3028::setUNIX(uint32_t value)//###
+{
+	uint8_t unix_reg[4];
+	unix_reg[0] = value;
+	unix_reg[1] = value >> 8;
+	unix_reg[2] = value >> 16;
+	unix_reg[3] = value >> 24;
+
+	return writeMultipleRegisters(RV3028_UNIX_TIME0, unix_reg, 4);
+}
+
+//ATTENTION: Real Time and UNIX Time are INDEPENDENT!
+uint32_t RV3028::getUNIX()//###
+{
+	uint8_t unix_reg[4];
+	readMultipleRegisters(RV3028_UNIX_TIME0, unix_reg, 4);
+	return ((uint32_t)unix_reg[3] << 24) | ((uint32_t)unix_reg[2] << 16) | ((uint32_t)unix_reg[1] << 8) | unix_reg[0];
+}
+
+
 /*
 bool RV3028::setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month)
 {

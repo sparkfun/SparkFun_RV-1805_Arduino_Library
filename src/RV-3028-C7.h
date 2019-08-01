@@ -253,6 +253,10 @@ public:
 	void set12Hour();//######
 	void set24Hour();//######
 
+	//ATTENTION: Real Time and UNIX Time are INDEPENDENT!
+	bool setUNIX(uint32_t value);//######
+	uint32_t getUNIX();//######
+
 	uint8_t status(); //Returns the status byte//######
 
 	/*
