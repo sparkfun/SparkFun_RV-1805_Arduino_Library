@@ -19,6 +19,14 @@ setWeekday	KEYWORD2
 setDate	KEYWORD2
 setMonth	KEYWORD2
 setYear	KEYWORD2
+setToCompilerTime	KEYWORD2
+
+updateTime	KEYWORD2
+
+stringDateUSA	KEYWORD2
+stringDate	KEYWORD2
+stringTime	KEYWORD2
+stringTimeStamp	KEYWORD2
 
 getSeconds	KEYWORD2
 getMinutes	KEYWORD2
@@ -28,21 +36,13 @@ getDate	KEYWORD2
 getMonth	KEYWORD2
 getYear	KEYWORD2
 
-updateTime	KEYWORD2
-stringDateUSA	KEYWORD2
-stringDate	KEYWORD2
-stringTime	KEYWORD2
-stringTimeStamp	KEYWORD2
-
-setToCompilerTime	KEYWORD2
 is12Hour	KEYWORD2
 isPM	KEYWORD2
 set12Hour	KEYWORD2
 set24Hour	KEYWORD2
+
 setUNIX	KEYWORD2
 getUNIX	KEYWORD2
-
-status	KEYWORD2
 
 enableAlarmInterrupt	KEYWORD2
 disableAlarmInterrupt	KEYWORD2
@@ -52,9 +52,9 @@ enableTrickleCharge	KEYWORD2
 disableTrickleCharge	KEYWORD2
 setBackupSwitchoverMode	KEYWORD2
 
+status	KEYWORD2
 clearInterrupts	KEYWORD2
-checkBattery	KEYWORD2
-setReferenceVoltage	KEYWORD2
+
 
 BCDtoDEC	KEYWORD2
 DECtoBCD	KEYWORD2
