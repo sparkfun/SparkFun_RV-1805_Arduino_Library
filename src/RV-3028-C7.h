@@ -135,8 +135,12 @@ Distributed as-is; no warranty is given.
 #define CTRL2_RESET		0//###
 
 //Bits in Hours register
-#define HOURS_AM_PM						5//######
+#define HOURS_AM_PM			5//######
 
+//Bits in Alarm registers
+#define MINUTESALM_AE_M		7//###
+#define HOURSALM_AE_H		7//###
+#define DATE_AE_WD			7//###
 
 
 //START BRAUCHE ICH DAS NOCH????
@@ -253,17 +257,17 @@ public:
 	void set12Hour();//######
 	void set24Hour();//######
 
-	//ATTENTION: Real Time and UNIX Time are INDEPENDENT!
 	bool setUNIX(uint32_t value);//######
 	uint32_t getUNIX();//######
 
 	uint8_t status(); //Returns the status byte//######
 
-	/*
-	bool setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month);
-	bool setAlarm(uint8_t * time, uint8_t len);
-	void setAlarmMode(uint8_t mode); //0 to 7, alarm goes off with match of second, minute, hour, etc
+	void enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode);//###
+	void enableAlarmInterrupt();//###
+	void disableAlarmInterrupt();//###
+	bool readAlarmInterruptFlag();//###
 
+	/*
 	void enableSleep();
 	void setPowerSwitchFunction(uint8_t function);
 	void setPowerSwitchLock(bool lock);
@@ -273,10 +277,7 @@ public:
 
 	void enableLowPower();
 
-	void enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
-	void disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
 	void enableBatteryInterrupt(uint8_t voltage, bool edgeTrigger);
-	void enableAlarmInterrupt(); //Use in conjuction with setAlarm and setAlarmMode
 
 	bool checkBattery(uint8_t voltage);
 	void setEdgeTrigger(bool edgeTrigger);

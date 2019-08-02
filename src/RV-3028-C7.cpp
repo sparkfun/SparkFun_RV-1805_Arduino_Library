@@ -75,9 +75,12 @@ boolean RV3028::begin(TwoWire &wirePort)//###
 	//external to the library
 	//_i2cPort->begin();
 	_i2cPort = &wirePort;
-
+	
+	delay(1);
 	set24Hour();
+	delay(1);
 	disableTrickleCharge();
+	delay(1);
 
 	return(setBackupSwitchoverMode(3) && writeRegister(RV3028_STATUS, 0x00));
 }
@@ -385,7 +388,6 @@ bool RV3028::setToCompilerTime()//###
 	uint16_t d = BUILD_DATE;
 	uint16_t m = BUILD_MONTH;
 	uint16_t y = BUILD_YEAR;
-	//TODO?
 	uint16_t weekday = (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7 + 1;
 	_time[TIME_WEEKDAY] = DECtoBCD(weekday);
 
@@ -416,33 +418,75 @@ uint32_t RV3028::getUNIX()//###
 	return ((uint32_t)unix_reg[3] << 24) | ((uint32_t)unix_reg[2] << 16) | ((uint32_t)unix_reg[1] << 8) | unix_reg[0];
 }
 
+/*********************************
+Set the alarm mode in the following way:
+0: When minutes, hours and weekday/date match (once per weekday/date)
+1: When hours and weekday/date match (once per weekday/date)
+2: When minutes and weekday/date match (once per hour per weekday/date)
+3: When weekday/date match (once per weekday/date)
+4: When hours and minutes match (once per day)
+5: When hours match (once per day)
+6: When minutes match (once per hour)
+7: All disabled – Default value
+If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday)
+********************************/
+void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode)//###
+{
+	//disable Alarm Interrupt to prevent accidental interrupts during configuration
+	disableAlarmInterrupt(); clearInterrupts();
+
+	//ENHANCEMENT: Add Alarm in 12 hour mode
+	set24Hour();
+	//Set WADA bit (Weekday/Date Alarm)
+	uint8_t value = readRegister(RV3028_CTRL1);
+	if (setWeekdayAlarm_not_Date)
+		value &= ~(1 << CTRL1_WADA);
+	else
+		value |= 1 << CTRL1_WADA;
+	writeRegister(RV3028_CTRL1, value);
+
+	//Write alarm settings in registers 0x07 to 0x09
+	uint8_t alarmTime[3];
+	alarmTime[0] = DECtoBCD(min);				//minutes
+	alarmTime[1] = DECtoBCD(hour);				//hours
+	alarmTime[2] = DECtoBCD(date_or_weekday);	//date or weekday
+	//shift alarm enable bits
+	if (mode > 0b111) mode = 0b111; //0 to 7 is valid
+	if (mode & 0b001)
+		alarmTime[0] |= 1 << MINUTESALM_AE_M;
+	if (mode & 0b010)
+		alarmTime[1] |= 1 << HOURSALM_AE_H;
+	if (mode & 0b100)
+		alarmTime[2] |= 1 << DATE_AE_WD;
+	//Write registers
+	writeMultipleRegisters(RV3028_MINUTES_ALM, alarmTime, 3);
+
+	//enable Alarm Interrupt
+	enableAlarmInterrupt();
+}
+
+void RV3028::enableAlarmInterrupt()//###
+{
+	uint8_t value = readRegister(RV3028_CTRL2);
+	value |= (1 << CTRL2_AIE); //Set the interrupt enable bit
+	writeRegister(RV3028_CTRL2, value);
+}
+
+//Only disables the interrupt (not the alarm flag)
+void RV3028::disableAlarmInterrupt()//###
+{
+	uint8_t value = readRegister(RV3028_CTRL2);
+	value &= ~(1 << CTRL2_AIE); //Clear the interrupt enable bit
+	writeRegister(RV3028_CTRL2, value);
+}
+
+bool RV3028::readAlarmInterruptFlag()//###
+{
+	uint8_t stat = status();
+	return stat & (1 << STATUS_AF);
+}
 
 /*
-bool RV3028::setAlarm(uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month)
-{
-	uint8_t alarmTime[TIME_ARRAY_LENGTH];
-
-	alarmTime[TIME_HUNDREDTHS] = DECtoBCD(0); //This library assumes we are operating on RC oscillator. Hundredths alarm is not valid in this mode.
-	alarmTime[TIME_SECONDS] = DECtoBCD(sec);
-	alarmTime[TIME_MINUTES] = DECtoBCD(min);
-	alarmTime[TIME_HOURS] = DECtoBCD(hour);
-	alarmTime[TIME_DATE] = DECtoBCD(date);
-	alarmTime[TIME_MONTH] = DECtoBCD(month);
-	alarmTime[TIME_YEAR] = DECtoBCD(0); //Our alarm cannot read these values, so we set them to 0
-	alarmTime[TIME_DAY] = DECtoBCD(0);
-
-	return setAlarm(alarmTime, TIME_ARRAY_LENGTH);
-}
-
-bool RV3028::setAlarm(uint8_t * alarmTime, uint8_t len)
-{
-	if (len != TIME_ARRAY_LENGTH)
-		return false;
-
-	return writeMultipleRegisters(RV3028_HUNDREDTHS_ALM, alarmTime, TIME_ARRAY_LENGTH);
-}
-
-
 void RV3028::enableSleep()
 {
 	uint8_t value;
@@ -478,59 +522,6 @@ void RV3028::setStaticPowerSwitchOutput(bool psw)
 	writeRegister(RV3028_CTRL1, value);
 }
 
-*/
-/*********************************
-Given a bit location, enable the interrupt
-INTERRUPT_BLIE	4
-INTERRUPT_TIE	3
-INTERRUPT_AIE	2
-INTERRUPT_EIE	1
-*********************************/
-/*
-void RV3028::enableInterrupt(uint8_t source)
-{
-	uint8_t value = readRegister(RV3028_INT_MASK);
-	value |= (1<<source); //Set the interrupt enable bit
-	writeRegister(RV3028_INT_MASK, value);
-}
-
-void RV3028::disableInterrupt(uint8_t source)
-{
-	uint8_t value = readRegister(RV3028_INT_MASK);
-	value &= ~(1<<source); //Clear the interrupt enable bit
-	writeRegister(RV3028_INT_MASK, value);
-}
-*/
-/********************************
-Set Alarm Mode controls which parts of the time have to match for the alarm to trigger.
-When the RTC matches a given time, make an interrupt fire.
-
-Mode must be between 0 and 7 to tell when the alarm should be triggered.
-Alarm is triggered when listed characteristics match:
-0: Disabled
-1: Hundredths, seconds, minutes, hours, date and month match (once per year)
-2: Hundredths, seconds, minutes, hours and date match (once per month)
-3: Hundredths, seconds, minutes, hours and weekday match (once per week)
-4: Hundredths, seconds, minutes and hours match (once per day)
-5: Hundredths, seconds and minutes match (once per hour)
-6: Hundredths and seconds match (once per minute)
-7: Depends on RV3028_HUNDREDTHS_ALM (0x08) value.
-	0x08: 0x00-0x99 Hundredths match (once per second)
-	0x08: 0xF0-0xF9 Once per tenth (10 Hz)
-	0x08: 0xFF Once per hundredth (100 Hz)
-********************************/
-/*
-void RV3028::setAlarmMode(uint8_t mode)
-{
-	if (mode > 0b111) mode = 0b111; //0 to 7 is valid
-
-	uint8_t value = readRegister(RV3028_CTDWN_TMR_CTRL);
-	value &= 0b11100011; //Clear ARPT bits
-	value |= (mode << 2);
-	writeRegister(RV3028_CTDWN_TMR_CTRL, value);
-}
-
-
 void RV3028::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool pulse)
 {
 	// Invalid configurations
@@ -550,25 +541,6 @@ void RV3028::setCountdownTimer(uint8_t duration, uint8_t unit, bool repeat, bool
 	value |= (repeat << CTDWN_TMR_TRPT_OFFSET);
 	value |= (1 << CTDWN_TMR_TE_OFFSET); // Timer enable
 	writeRegister(RV3028_CTDWN_TMR_CTRL, value);
-}
-
-
-//Enable the charger and set the diode and inline resistor
-//Default is 0.3V for diode and 3k for resistor
-void RV3028::enableTrickleCharge(uint8_t diode, uint8_t rOut)
-{
-	writeRegister(RV3028_CONF_KEY, RV3028_CONF_WRT); //Write the correct value to CONFKEY to unlock this bank of registers
-	uint8_t value = 0;
-	value |= (TRICKLE_ENABLE << TRICKLE_CHARGER_TCS_OFFSET);
-	value |= (diode << TRICKLE_CHARGER_DIODE_OFFSET);
-	value |= (rOut << TRICKLE_CHARGER_ROUT_OFFSET);
-	writeRegister(RV3028_TRICKLE_CHRG, value);
-}
-
-void RV3028::disableTrickleCharge()
-{
-	writeRegister(RV3028_CONF_KEY, RV3028_CONF_WRT);
-	writeRegister(RV3028_TRICKLE_CHRG, (TRICKLE_DISABLE << TRICKLE_CHARGER_TCS_OFFSET));
 }
 
 void RV3028::enableLowPower()
@@ -657,11 +629,13 @@ void RV3028::setEdgeTrigger(bool edgeTrigger)
 }
 */
 
-//Enable the Trickle Charger and set the Trickle Charge series resistor (default is 11k)
-//TCR_1K  =  1kOhm
-//TCR_3K  =  3kOhm
-//TCR_6K  =  6kOhm
-//TCR_11K = 11kOhm	
+/*********************************
+Enable the Trickle Charger and set the Trickle Charge series resistor (default is 11k)
+TCR_1K  =  1kOhm
+TCR_3K  =  3kOhm
+TCR_6K  =  6kOhm
+TCR_11K = 11kOhm	
+*********************************/
 void RV3028::enableTrickleCharge(uint8_t tcr)//###
 {
 	if (tcr > 3) return;
@@ -687,10 +661,12 @@ void RV3028::disableTrickleCharge()//###
 	writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup);
 }
 
-//0 = Switchover disabled
-//1 = Direct Switching Mode
-//2 = Standby Mode
-//3 = Level Switching Mode
+/*********************************
+0 = Switchover disabled
+1 = Direct Switching Mode
+2 = Standby Mode
+3 = Level Switching Mode
+*********************************/
 bool RV3028::setBackupSwitchoverMode(uint8_t val)//###
 {
 	if (val > 3)return false;

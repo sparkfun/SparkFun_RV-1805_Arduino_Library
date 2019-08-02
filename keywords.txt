@@ -12,7 +12,6 @@ RV3028	KEYWORD1
 
 begin	KEYWORD2
 setTime	KEYWORD2
-setHundredths	KEYWORD2
 setSeconds	KEYWORD2
 setMinutes	KEYWORD2
 setHours	KEYWORD2
@@ -21,7 +20,6 @@ setDate	KEYWORD2
 setMonth	KEYWORD2
 setYear	KEYWORD2
 
-getHundredths	KEYWORD2
 getSeconds	KEYWORD2
 getMinutes	KEYWORD2
 getHours	KEYWORD2
@@ -46,17 +44,9 @@ getUNIX	KEYWORD2
 
 status	KEYWORD2
 
-setAlarm	KEYWORD2
-setAlarmMode	KEYWORD2
-enableTrickleCharger	KEYWORD2
-disableTrickleCharger	KEYWORD2
-enableLowPower	KEYWORD2
-enableInterrupt	KEYWORD2
-disableInterrupt	KEYWORD2
-enableBatteryInterrupt	KEYWORD2
 enableAlarmInterrupt	KEYWORD2
-
-setEdgeTrigger	KEYWORD2
+disableAlarmInterrupt	KEYWORD2
+readAlarmInterruptFlag	KEYWORD2
 
 enableTrickleCharge	KEYWORD2
 disableTrickleCharge	KEYWORD2
