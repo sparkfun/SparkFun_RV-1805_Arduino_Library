@@ -34,7 +34,7 @@ The library enables the following functions:
 
 <sub>
 Please call begin() sometime after initializing the I2C interface with Wire.begin().
-<sub>
+</sub>
 
 ###### `begin()`
 ###### `is12Hour()`
@@ -64,7 +64,7 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 
 <sub>
 Please call "updateTime()" before calling one of the other getTime functions.
-<sub>
+</sub>
 
 ###### `updateTime()`
 ###### `getSeconds()`
@@ -85,7 +85,7 @@ Please call "updateTime()" before calling one of the other getTime functions.
 
 <sub>
 Attention: UNIX Time and real time are INDEPENDENT!
-<sub>
+</sub>
 
 ###### `setUNIX(value)`
 ###### `getUNIX()`
@@ -95,16 +95,22 @@ Attention: UNIX Time and real time are INDEPENDENT!
 #### Alarm Interrupt functions
 <hr>
 
-<sub>
-If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).
-<sub>
-
 ###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode)`
 ###### `disableAlarmInterrupt()`
 ###### `readAlarmInterruptFlag()`
 
-<sub>For further information about the alarm mode see [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 67*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=67).
-<sub>
+<sub>Set the alarm mode in the following way:  
+0: When minutes, hours and weekday/date match (once per weekday/date)  
+1: When hours and weekday/date match (once per weekday/date)  
+2: When minutes and weekday/date match (once per hour per weekday/date)  
+3: When weekday/date match (once per weekday/date)  
+4: When hours and minutes match (once per day)  
+5: When hours match (once per day)  
+6: When minutes match (once per hour)  
+7: All disabled – Default value  
+If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).  
+For further information about the alarm mode see [*Application Manual p. 67*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=67).
+</sub>
 
 <hr>
 
@@ -115,8 +121,13 @@ If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_
 ###### `disableTrickleCharge()`
 
 <sub>
-At "enableTrickleCharge" you can choose between TCR_1K for 1kOhm series resistor, TCR_3K for 3kOhm, TCR_6K for 6kOhm and TCR_11K for 11kOhm. See [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 46*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=46) for more information.
-<sub>
+At "enableTrickleCharge" you can choose the series resistor:  
+TCR_1K for 1kOhm  
+TCR_3K for 3kOhm  
+TCR_6K for 6kOhm  
+TCR_11K for 11kOhm  
+See [*Application Manual p. 46*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=46) for more information.
+</sub>
 
 <hr>
 
@@ -126,8 +137,12 @@ At "enableTrickleCharge" you can choose between TCR_1K for 1kOhm series resistor
 ###### `setBackupSwitchoverMode(mode)`
 
 <sub>
-Value between 0 and 3, see [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 43*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=43) for more information.
-<sub>
+0 = Switchover disabled  
+1 = Direct Switching Mode  
+2 = Standby Mode  
+3 = Level Switching Mode  
+See [*Application Manual p. 43*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=43) for more information.
+</sub>
 
 License Information
 -------------------
