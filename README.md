@@ -1,24 +1,20 @@
 RTC RV-3028-C7 Arduino Library
 ========================================
 
-```diff
-- this repository is still in work!
-```
-
 ![Real Time Clock ](https://www.mouser.de/images/microcrystal/images/RV-3028-C7_series_t.jpg)
 
 [*Application Manual*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf)
 
 The RV-3028-C7 is an extremely precise, extremely low power, highly configurable RTC. Under ideal conditions it runs at approximately 40nA with +/-5ppm per year of deviation (+/- 160 seconds worst case per year).
-This library was originally forked from the [Sparkfun RV-1805 library](https://github.com/sparkfun/SparkFun_RV-1805_Arduino_Library) and costumized to RV-3028-C7.
+This library was originally forked from the [Sparkfun RV-1805 library](https://github.com/sparkfun/SparkFun_RV-1805_Arduino_Library), and costumized and enhanced to the RV-3028-C7.
 
 This library allows the user to:
 
 * Set time using hard numbers or the BUILD_TIME from the Arduino compiler
 * Read time
-* Configure various aspects of the RTC including setting of alarms, interrupts, and wave outputs
+* Configure various aspects of the RTC including setting of alarms, trickle charging or power switchover mode
 
-Examples are included to get you started
+Examples are included to get you started.
 
 Repository Contents
 -------------------
@@ -30,8 +26,108 @@ Repository Contents
 
 Documentation
 --------------
-* **[Installing an Arduino Library Guide](https://learn.sparkfun.com/tutorials/installing-an-arduino-library)** - Basic information on how to install an Arduino library.
-* **[Main Repository](https://github.com/constiko/RV-3028_C7-Arduino_Library)** - Main repository for the RV-3028-C7 Arduino library
+The library enables the following functions:
+<hr>
+
+#### General functions
+<hr>
+
+<sub>
+Please call begin() sometime after initializing the I2C interface with Wire.begin().
+<sub>
+
+###### `begin()`
+###### `is12Hour()`
+###### `isPM()`
+###### `set12Hour()`
+###### `set24Hour()`
+
+<hr>
+
+#### Set Time functions
+<hr>
+
+###### `setTime(sec, min, hour, weekday, date, month, year);`
+###### `setSeconds(value)`
+###### `setMinutes(value)`
+###### `setHours(value)`
+###### `setWeekday(value)`
+###### `setDate(value)`
+###### `setMonth(value)`
+###### `setYear(value)`
+###### `setToCompilerTime()`
+
+<hr>
+
+#### Get Time functions
+<hr>
+
+<sub>
+Please call "updateTime()" before calling one of the other getTime functions.
+<sub>
+
+###### `updateTime()`
+###### `getSeconds()`
+###### `getHours()`
+###### `getWeekday()`
+###### `getDate()`
+###### `getMonth()`
+###### `getYear()`
+###### `stringDateUSA()`
+###### `stringDate()`
+###### `stringTime()`
+###### `stringTimeStamp()`
+
+<hr>
+
+#### UNIX Time functions
+<hr>
+
+<sub>
+Attention: UNIX Time and real time are INDEPENDENT!
+<sub>
+
+###### `setUNIX(value)`
+###### `getUNIX()`
+
+<hr>
+
+#### Alarm Interrupt functions
+<hr>
+
+<sub>
+If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).
+<sub>
+
+###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode)`
+###### `disableAlarmInterrupt()`
+###### `readAlarmInterruptFlag()`
+
+<sub>For further information about the alarm mode see [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 67*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=67).
+<sub>
+
+<hr>
+
+#### Trickle charge functions
+<hr>
+
+###### `enableTrickleCharge(uint8_t tcr = TCR_11K)`
+###### `disableTrickleCharge()`
+
+<sub>
+At "enableTrickleCharge" you can choose between TCR_1K for 1kOhm series resistor, TCR_3K for 3kOhm, TCR_6K for 6kOhm and TCR_11K for 11kOhm. See [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 46*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=46) for more information.
+<sub>
+
+<hr>
+
+#### Backup Switchover Mode
+<hr>
+
+###### `setBackupSwitchoverMode(mode)`
+
+<sub>
+Value between 0 and 3, see [*RV-3028-C7.cpp*](src/RV-3028-C7.cpp) or [*Application Manual p. 43*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=43) for more information.
+<sub>
 
 License Information
 -------------------
