@@ -473,7 +473,7 @@ void RV3028::disableAlarmInterrupt()
 bool RV3028::readAlarmInterruptFlag()
 {
 	uint8_t stat = status();
-	return stat & (1 << STATUS_AF);
+	return (stat & (1 << STATUS_AF));
 }
 
 /*********************************

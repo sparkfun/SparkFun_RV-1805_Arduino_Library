@@ -1,91 +1,97 @@
 /*
-  Getting the alarm to fire an interrupt on the RV-1805 Real Time Clock
-  By: Andy England
-  SparkFun Electronics
-  Date: 2/22/2017
+  Setting alarm interrupts at RV-3028-C7 Real Time Clock
+  By: Constantin Koch
+  Date: 7/31/2019
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
-  Feel like supporting our work? Buy a board from SparkFun!
-  https://www.sparkfun.com/products/14642
+  Feel like supporting my work? Give me a star!
+  https://github.com/constiko/RV-3028_C7-Arduino_Library
 
-  This example shows how to set an alarm and make the RTC generate an interrupt when the clock time matches the alarm time
-  The INT pin will be 3.3V. When the real time matches the alarm time the INT pin will go low.
-
-  Hardware Connections:
-    Attach the Qwiic Shield to your Arduino/Photon/ESP32 or other
-    Plug the RTC into the shield (any port)
-    Open the serial monitor at 115200 baud
+  This example shows how to set alarm interrupts at RV-3028-C7 Real Time Clock.
+  Open the serial monitor at 115200 baud
 */
 
-#include <SparkFun_RV1805.h>
+#include <RV-3028-C7.h>
 
-RV1805 rtc;
+RV3028 rtc;
 
-byte secondsAlarm = 0;
-byte minuteAlarm = 0;
-byte hourAlarm = 0;
-byte dateAlarm = 0;
-byte monthAlarm = 0;
+//The below variables control what the date will be set to
+int sec = 45;
+int minute = 59;
+int hour = 19;
+int day = 5;
+int date = 2;
+int month = 8;
+int year = 2019;
 
+//The below variables control what the alarm will be set to
+int alm_minute = 0;
+int alm_hour = 20;
+int alm_date_or_weekday = 2;
+bool alm_isweekday = false;
+bool alm_mode = 0;
+/*********************************
+  Set the alarm mode in the following way:
+  0: When minutes, hours and weekday/date match (once per weekday/date)
+  1: When hours and weekday/date match (once per weekday/date)
+  2: When minutes and weekday/date match (once per hour per weekday/date)
+  3: When weekday/date match (once per weekday/date)
+  4: When hours and minutes match (once per day)
+  5: When hours match (once per day)
+  6: When minutes match (once per hour)
+  7: All disabled – Default value
+  If you want to set a weekday alarm (alm_isweekday = true), set 'alm_date_or_weekday' from 0 (Sunday) to 6 (Saturday)
+********************************/
 void setup() {
 
+  Serial.begin(115200);
+  while (!Serial);
+  Serial.println("Read/Write Time - RTC Example");
+
   Wire.begin();
-
-  Serial.begin(9600);
-  Serial.println("Alarm from RTC Example");
-
   if (rtc.begin() == false) {
     Serial.println("Something went wrong, check wiring");
+    while (1);
   }
+  else
+    Serial.println("RTC online!");
+  delay(1000);
 
-  rtc.setAlarm(secondsAlarm, minuteAlarm, hourAlarm, dateAlarm, monthAlarm); //Sets the alarm with the values initialized above
-
-  /********************************
-    Mode must be between 0 and 7 to tell when the alarm should be triggered.
-    Alarm is triggered when listed characteristics match
-    0: Disabled
-    1: seconds, minutes, hours, date and month match (once per year)
-    2: seconds, minutes, hours and date match (once per month)
-    3: seconds, minutes, hours and weekday match (once per week)
-    4: seconds, minutes and hours match (once per day)
-    5: seconds and minutes match (once per hour)
-    6: seconds match (once per minute)
-    7: once per second
-  ********************************/
-  //rtc.setAlarmMode(7); //Once per second
-  //rtc.setAlarmMode(6); //Once per minute
-  //rtc.setAlarmMode(5); //Once per hour: Alarm will go off every time there is a hundredths+seconds+minutes match (each hour)
-  rtc.setAlarmMode(4); //Alarm goes off every day
-  rtc.enableInterrupt(INTERRUPT_AIE); //Enable the Alarm Interrupt
+  //Enable alarm interrupt
+  rtc.enableAlarmInterrupt(alm_minute, alm_hour, alm_date_or_weekday, alm_isweekday, alm_mode);
+  //rtc.disableAlarmInterrupt();  //Only disables the interrupt (not the alarm flag)
 }
 
 void loop() {
+
+  //PRINT TIME
   if (rtc.updateTime() == false) //Updates the time variables from RTC
   {
     Serial.print("RTC failed to update");
+  } else {
+    String currentTime = rtc.stringTimeStamp();
+    Serial.println(currentTime + "     \'s\' = set time");
+  }
+  
+  //Read Alarm Flag
+  if (rtc.readAlarmInterruptFlag()) {
+    Serial.println("ALARM!!!!");
+    delay(3000);
   }
 
-  String currentDate = rtc.stringDateUSA(); //Get the current date in mm/dd/yyyy format (we're weird)
-  //String currentDate = rtc.stringDate()); //Get the current date in dd/mm/yyyy format
-  String currentTime = rtc.stringTime(); //Get the time
-
-  Serial.print(currentDate);
-  Serial.print(" ");
-  Serial.println(currentTime);
-
-  /*byte rtcStatus = rtc.status(); //Get the latest status from RTC. Reading the status clears the flags
-  if(rtcStatus != 0)
-  {
-    Serial.println("An interrupt as occured: ");
-    //Determine which bits are set
-    if(rtcStatus & (1<<STATUS_CB)) Serial.println("It's a new century!");
-    if(rtcStatus & (1<<STATUS_BAT)) Serial.println("System is on backup battery");
-    if(rtcStatus & (1<<STATUS_WDF)) Serial.println("Watchdog timer trigger");
-    if(rtcStatus & (1<<STATUS_BLF)) Serial.println("Battery is below threshold");
-    if(rtcStatus & (1<<STATUS_TF)) Serial.println("Countdown timer at zero");
-    if(rtcStatus & (1<<STATUS_AF)) Serial.println("Alarm went off!");
-    if(rtcStatus & (1<<STATUS_EVF)) Serial.println("External event detected");
-  }*/
-
-  delay(1000);
+  //SET TIME???
+  if (Serial.available()) {
+    switch (Serial.read()) {
+      case 's':
+        //Use the time from the Arduino compiler (build time) to set the RTC
+        //Keep in mind that Arduino does not get the new compiler time every time it compiles. to ensure the proper time is loaded, open up a fresh version of the IDE and load the sketch.
+        /*if (rtc.setToCompilerTime() == false) {
+          Serial.println("Something went wrong setting the time");
+          }*/
+        if (rtc.setTime(sec, minute, hour, day, date, month, year) == false) {
+          Serial.println("Something went wrong setting the time");
+        }
+        break;
+    }
+  }
 }
