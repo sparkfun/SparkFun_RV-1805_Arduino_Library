@@ -64,6 +64,7 @@ Please call "updateTime()" before calling one of the other getTime functions.
 
 ###### `updateTime()`
 ###### `getSeconds()`
+###### `getMinutes()`
 ###### `getHours()`
 ###### `getWeekday()`
 ###### `getDate()`
