@@ -104,7 +104,7 @@ Set the alarm mode in the following way:
 6: When minutes match (once per hour)  
 7: All disabled – Default value  
 If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).  
-For further information about the alarm mode see [*Application Manual p. 67*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=67).
+For further information about the alarm mode see [*Application Manual p. 68*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=68).
 
 <hr>
 
@@ -119,7 +119,7 @@ TCR_1K for 1kOhm
 TCR_3K for 3kOhm  
 TCR_6K for 6kOhm  
 TCR_11K for 11kOhm  
-See [*Application Manual p. 46*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=46) for more information.
+See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=48) for more information.
 
 <hr>
 
@@ -132,7 +132,7 @@ See [*Application Manual p. 46*](https://www.microcrystal.com/fileadmin/Media/Pr
 1 = Direct Switching Mode  
 2 = Standby Mode  
 3 = Level Switching Mode  
-See [*Application Manual p. 43*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=43) for more information.
+See [*Application Manual p. 45*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=45) for more information.
 
 License Information
 -------------------
