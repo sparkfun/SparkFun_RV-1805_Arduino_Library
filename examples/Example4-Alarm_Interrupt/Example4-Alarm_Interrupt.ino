@@ -29,7 +29,7 @@ int alm_minute = 0;
 int alm_hour = 20;
 int alm_date_or_weekday = 2;
 bool alm_isweekday = false;
-bool alm_mode = 0;
+uint8_t alm_mode = 0;
 /*********************************
   Set the alarm mode in the following way:
   0: When minutes, hours and weekday/date match (once per weekday/date)
