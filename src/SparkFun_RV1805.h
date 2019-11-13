@@ -214,7 +214,9 @@ class RV1805
 	void enableTrickleCharge(uint8_t diode = DIODE_0_3V, uint8_t rOut = ROUT_3K); //Diode default 0.3V, rOut default 3k
 	void disableTrickleCharge();
 	void enableLowPower();
-
+    void enableCrystalOscillator();
+	void disableCrystalOscillator();
+	
 	void enableInterrupt(uint8_t source); //Enables a given interrupt within Interrupt Enable register
 	void disableInterrupt(uint8_t source); //Disables a given interrupt within Interrupt Enable register
 	void enableBatteryInterrupt(uint8_t voltage, bool edgeTrigger);

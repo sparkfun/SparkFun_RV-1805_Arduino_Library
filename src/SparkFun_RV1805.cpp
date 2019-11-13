@@ -80,14 +80,15 @@ boolean RV1805::begin(TwoWire &wirePort)
 	if (sensorPartNumber != RV1805_PART_NUMBER_UPPER) //HW version for RV1805
 		return(false); //Something went wrong. IC didn't respond.
 
-	//enableTrickleCharge();
+	enableTrickleCharge();
 	//enableLowPower(); NoGo when using hundredths
+	enableCrystalOscillator();  // hundredths counter is only available when the XT Oscillator is selected.
 
 	uint8_t setting = readRegister(RV1805_CTRL1);
 	setting |= CTRL1_ARST; //Enables clearing of interrupt flags upon read of status register
 	writeRegister(RV1805_CTRL1, setting);
 
-	set12Hour();
+	set24Hour();
 
 	return(true);
 }
@@ -577,9 +578,25 @@ void RV1805::enableLowPower()
 
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_OSC); //Unlock again
 	writeRegister(RV1805_OSC_CTRL, 0b11111100); //OSEL=1, ACAL=11, BOS=1, FOS=1, IOPW=1, OFIE=0, ACIE=0
-	//Use RC Oscillator all the time (to save moar power)
-	//Autocalibrate every 512 seconds to get to 22nA mode
-	//Switch to RC Oscillator when powered by VBackup
+												//Use RC Oscillator all the time (to save moar power)
+												//Autocalibrate every 512 seconds to get to 22nA mode
+												//Switch to RC Oscillator when powered by VBackup
+}
+
+void RV1805::enableCrystalOscillator() {
+	uint8_t value = readRegister(RV1805_OSC_CTRL);
+	value &= 0b00011111;
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_OSC);
+	writeRegister(RV1805_OSC_CTRL, value);
+}
+
+void RV1805::disableCrystalOscillator() {
+	uint8_t value = readRegister(RV1805_OSC_CTRL);
+	value &= 0b00011111;
+	value |= (1 << 7);    // Uses RC oscillator all the time to minimize power usage
+	value |= (0b11 << 5); // Enables autocalibration every 512 seconds (22 nA consumption)
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_OSC);
+	writeRegister(RV1805_OSC_CTRL, value);
 }
 
 /*******************************************
