@@ -43,6 +43,7 @@ Distributed as-is; no warranty is given.
 #define CTRL1_STOP	7
 #define CTRL1_12_24	6
 #define CTRL1_PSWB	5
+#define CTRL1_RSTP  3
 #define CTRL1_ARST						1 << 2 //Enables reset of interrupt flags in status register 
 
 //Bits in Hours register
@@ -70,6 +71,10 @@ Distributed as-is; no warranty is given.
 
 
 //PSW Pin Function Selection Bits
+#define PSW_ON			false
+#define PSW_OFF			true
+#define PSW_UNLOCK		false
+#define PSW_LOCK		true
 #define PSWS_OFFSET     2
 #define PSWS_INV_IRQ    0b000
 #define PSWS_SQW        0b001
@@ -85,7 +90,6 @@ Distributed as-is; no warranty is given.
 #define CTDWN_TMR_TE_OFFSET		7
 #define CTDWN_TMR_TM_OFFSET		6
 #define CTDWN_TMR_TRPT_OFFSET	5
-
 
 //Status Bits
 #define STATUS_CB	7

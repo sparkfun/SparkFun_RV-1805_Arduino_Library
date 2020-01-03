@@ -576,7 +576,13 @@ void RV1805::enableLowPower()
 	writeRegister(RV1805_OUT_CTRL, 0x30); //Disable WDI input, Set bit 4, Disable RST in sleep, Disable CLK/INT in sleep
 
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_OSC); //Unlock again
-	writeRegister(RV1805_OSC_CTRL, 0b11111100); //OSEL=1, ACAL=11, BOS=1, FOS=1, IOPW=1, OFIE=0, ACIE=0	
+	writeRegister(RV1805_OSC_CTRL, 0b11111100); //OSEL=1, ACAL=11, BOS=1, FOS=1, IOPW=1, OFIE=0, ACIE=0			
+	//Set the 12/24 hour bit
+	uint8_t setting = readRegister(RV1805_CTRL1);
+	setting |= (1<<CTRL1_RSTP);
+	writeRegister(RV1805_CTRL1, setting);//Sets reset pin high
+	setPowerSwitchLock(PSW_UNLOCK); //unlocks power switch
+	setStaticPowerSwitchOutput(PSW_OFF); //turns off power switch
 	//Use RC Oscillator all the time (to save moar power)
 	//Autocalibrate every 512 seconds to get to 22nA mode
 	//Switch to RC Oscillator when powered by VBackup
