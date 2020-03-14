@@ -29,6 +29,16 @@ getWeekday	KEYWORD2
 getDate	KEYWORD2
 getMonth	KEYWORD2
 getYear	KEYWORD2
+getEpoch	KEYWORD2
+
+getAlarmHundredths	KEYWORD2
+getAlarmSeconds	KEYWORD2
+getAlarmMinutes	KEYWORD2
+getAlarmHours	KEYWORD2
+getAlarmWeekday	KEYWORD2
+getAlarmDate	KEYWORD2
+getAlarmMonth	KEYWORD2
+getAlarmYear	KEYWORD2
 
 updateTime	KEYWORD2
 stringDateUSA	KEYWORD2
