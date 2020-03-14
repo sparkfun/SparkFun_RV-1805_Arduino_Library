@@ -83,6 +83,9 @@ boolean RV1805::begin(TwoWire &wirePort)
 	enableTrickleCharge();
 	enableLowPower();
 
+	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT); // Enable write access to the CAPRC Register (26h)
+	writeRegister(RV1805_CAP_RC, 0xA0); // Enable Cap_RC pin
+
 	uint8_t setting = readRegister(RV1805_CTRL1);
 	setting |= CTRL1_ARST; //Enables clearing of interrupt flags upon read of status register
 	writeRegister(RV1805_CTRL1, setting);
