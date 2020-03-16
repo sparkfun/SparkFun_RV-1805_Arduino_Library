@@ -6,7 +6,7 @@ February 5, 2018
 https://github.com/sparkfun/Qwiic_RTC
 
 Development environment specifics:
-Arduino IDE 1.6.4
+Arduino IDE 1.8.12
 
 This code is released under the [MIT License](http://opensource.org/licenses/MIT).
 Please review the LICENSE.md file included with this example. If you have any questions
@@ -14,6 +14,7 @@ or concerns with licensing, please contact techsupport@sparkfun.com.
 Distributed as-is; no warranty is given.
 ******************************************************************************/
 
+#include <time.h>
 #include "SparkFun_RV1805.h"
 
 //****************************************************************************//
@@ -234,6 +235,23 @@ char* RV1805::stringTimeStamp()
 	return(timeStamp);
 }
 
+uint32_t RV1805::getEpoch()
+{
+  struct tm tm;
+
+  tm.tm_isdst = -1;
+  tm.tm_yday = 0;
+  tm.tm_wday = 0;
+  tm.tm_year = BCDtoDEC(_time[TIME_YEAR]) + 100;
+  tm.tm_mon = BCDtoDEC(_time[TIME_MONTH]) - 1;
+  tm.tm_mday = BCDtoDEC(_time[TIME_DATE]);
+  tm.tm_hour = BCDtoDEC(_time[TIME_HOURS]);
+  tm.tm_min = BCDtoDEC(_time[TIME_MINUTES]);
+  tm.tm_sec = BCDtoDEC(_time[TIME_SECONDS]);
+
+  return mktime(&tm);
+}
+
 bool RV1805::setTime(uint8_t hund, uint8_t sec, uint8_t min, uint8_t hour, uint8_t date, uint8_t month, uint16_t year, uint8_t day)
 {
 	_time[TIME_HUNDREDTHS] = DECtoBCD(hund);
@@ -368,6 +386,43 @@ uint8_t RV1805::getMonth()
 uint8_t RV1805::getYear()
 {
 	return BCDtoDEC(_time[TIME_YEAR]);
+}
+
+
+//Read alarm registers
+uint8_t RV1805::getAlarmHundredths()
+{
+	return BCDtoDEC(readRegister(RV1805_HUNDREDTHS_ALM));
+}
+
+uint8_t RV1805::getAlarmSeconds()
+{
+	return BCDtoDEC(readRegister(RV1805_SECONDS_ALM));
+}
+
+uint8_t RV1805::getAlarmMinutes()
+{
+	return BCDtoDEC(readRegister(RV1805_MINUTES_ALM));
+}
+
+uint8_t RV1805::getAlarmHours()
+{
+	return BCDtoDEC(readRegister(RV1805_HOURS_ALM));
+}
+
+uint8_t RV1805::getAlarmWeekday()
+{
+	return BCDtoDEC(readRegister(RV1805_WEEKDAYS_ALM));
+}
+
+uint8_t RV1805::getAlarmDate()
+{
+	return BCDtoDEC(readRegister(RV1805_DATE_ALM));
+}
+
+uint8_t RV1805::getAlarmMonth()
+{
+	return BCDtoDEC(readRegister(RV1805_MONTHS_ALM));
 }
 
 //Takes the time from the last build and uses it as the current time

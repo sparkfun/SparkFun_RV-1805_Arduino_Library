@@ -6,11 +6,11 @@ February 5, 2018
 https://github.com/sparkfun/Qwiic_RTC
 
 Resources:
-Uses Wire.h for i2c operation
+Uses Wire.h for I2C operation
 Uses SPI.h for SPI operation
 
 Development environment specifics:
-Arduino IDE 1.6.4
+Arduino IDE 1.8.12
 
 This code is released under the [MIT License](http://opensource.org/licenses/MIT).
 Please review the LICENSE.md file included with this example. If you have any questions 
@@ -194,7 +194,16 @@ class RV1805
 	uint8_t getDate();
 	uint8_t getMonth();
 	uint8_t getYear();	
-	
+	uint32_t getEpoch();
+
+	uint8_t getAlarmHundredths();
+	uint8_t getAlarmSeconds();
+	uint8_t getAlarmMinutes();
+	uint8_t getAlarmHours();
+	uint8_t getAlarmWeekday();
+	uint8_t getAlarmDate();
+	uint8_t getAlarmMonth();
+
 	bool setToCompilerTime(); //Uses the hours, mins, etc from compile time to set RTC
 	
 	bool is12Hour(); //Returns true if 12hour bit is set
