@@ -80,11 +80,11 @@ boolean RV1805::begin(TwoWire &wirePort)
 	if (sensorPartNumber != RV1805_PART_NUMBER_UPPER) //HW version for RV1805
 		return(false); //Something went wrong. IC didn't respond.
 
-	enableTrickleCharge();
-	enableLowPower();
-
 	writeRegister(RV1805_CONF_KEY, RV1805_CONF_WRT); //Enable write access to the CAPRC Register (26h)
 	writeRegister(RV1805_CAP_RC, 0xA0); //Enable Cap_RC pin
+
+	enableTrickleCharge();
+	enableLowPower();
 
 	uint8_t setting = readRegister(RV1805_CTRL1);
 	setting |= CTRL1_ARST; //Enables clearing of interrupt flags upon read of status register
