@@ -1,7 +1,7 @@
 RTC RV-3028-C7 Arduino Library
 ========================================
 
-![Real Time Clock](https://www.mouser.de/images/microcrystal/images/RV-3028-C7_series_t.jpg)
+![Real Time Clock](RV-3028-C7.jpg)
 
 [*Application Manual*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf)
 
