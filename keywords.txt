@@ -47,6 +47,16 @@ getUNIX	KEYWORD2
 enableAlarmInterrupt	KEYWORD2
 disableAlarmInterrupt	KEYWORD2
 readAlarmInterruptFlag	KEYWORD2
+clearAlarmInterruptFlag	KEYWORD2
+
+disableTimer	KEYWORD2
+disableTimerInterrupt	KEYWORD2
+readTimerInterruptFlag	KEYWORD2
+clearTimerInterruptFlag	KEYWORD2
+
+disablePeriodicUpdateInterrupt	KEYWORD2
+readPeriodicUpdateInterruptFlag	KEYWORD2
+clearPeriodicUpdateInterruptFlag	KEYWORD2
 
 enableTrickleCharge	KEYWORD2
 disableTrickleCharge	KEYWORD2
