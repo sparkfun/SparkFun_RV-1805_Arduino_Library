@@ -98,6 +98,7 @@ Distributed as-is; no warranty is given.
 
 //EEPROM Registers
 #define EEPROM_Clkout_Register			0x35
+#define RV3028_EEOffset_8_1				0x36	//bits 8 to 1 of EEOffset. Bit 0 is bit 7 of register 0x37 
 #define EEPROM_Backup_Register			0x37
 
 
@@ -160,6 +161,10 @@ Distributed as-is; no warranty is given.
 #define	TCR_6K							0b10			//Trickle Charge Resistor 6kOhm
 #define	TCR_11K							0b11			//Trickle Charge Resistor 11kOhm
 
+#define IMT_MASK_CEIE					3				//Clock output when Event Interrupt bit. 
+#define IMT_MASK_CAIE					2				//Clock output when Alarm Interrupt bit.
+#define IMT_MASK_CTIE					1				//Clock output when Periodic Countdown Timer Interrupt bit.
+#define IMT_MASK_CUIE					0				//Clock output when Periodic Time Update Interrupt bit.
 
 #define TIME_ARRAY_LENGTH 7 // Total number of writable values in device
 
@@ -179,7 +184,7 @@ public:
 
 	RV3028(void);
 
-	boolean begin(TwoWire &wirePort = Wire);
+	bool begin(TwoWire &wirePort = Wire);
 
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
@@ -220,7 +225,21 @@ public:
 	void enableAlarmInterrupt();
 	void disableAlarmInterrupt();
 	bool readAlarmInterruptFlag();
+	void clearAlarmInterruptFlag();
 
+	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool Go);
+	void enableTimer();
+	void disableTimer();
+	void enableTimerInterrupt();
+	void disableTimerInterrupt();
+	bool readTimerInterruptFlag();
+	void clearTimerInterruptFlag();
+
+	void setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output);
+	void disablePeriodicUpdateInterrupt();
+	bool readPeriodicUpdateInterruptFlag();
+	void clearPeriodicUpdateInterruptFlag();
+	
 	void enableTrickleCharge(uint8_t tcr = TCR_11K); //Trickle Charge Resistor default 11k
 	void disableTrickleCharge();
 	bool setBackupSwitchoverMode(uint8_t val);
@@ -241,14 +260,16 @@ public:
 	bool writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val);
 	uint8_t readConfigEEPROM_RAMmirror(uint8_t eepromaddr);
 	bool waitforEEPROM();
+	void reset();
 
+	void setBit(uint8_t reg_addr, uint8_t bit_num);
+	void clearBit(uint8_t reg_addr, uint8_t bit_num);
+	bool readBit(uint8_t reg_addr, uint8_t bit_num);
 private:	
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	TwoWire *_i2cPort;
 };
 
 //POSSIBLE ENHANCEMENTS :
-//ENHANCEMENT: Countdown Timer / Countdown Interrupt
-//ENHANCEMENT: Periodic Time Update Interrupt
 //ENHANCEMENT: Battery Interrupt / check battery voltage
 //ENHANCEMENT: Clock Output
