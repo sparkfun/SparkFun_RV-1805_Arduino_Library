@@ -12,9 +12,10 @@ This library allows the user to:
 
 * Set time using hard numbers or the BUILD_TIME from the Arduino compiler
 * Read time
-* Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging or power switchover mode.
+* Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging and power switchover mode.
 
-Examples are included to get you started.
+Examples are included to get you started (still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
+```
 
 Repository Contents
 -------------------
@@ -28,9 +29,7 @@ Documentation
 --------------
 The library enables the following functions:
 
-<hr>
-
-#### General functions
+### General functions
 Please call begin() sometime after initializing the I2C interface with Wire.begin().
 ###### `begin()`
 ###### `is12Hour()`
@@ -40,13 +39,13 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 
 <hr>
 
-#### Interrupt status
+### Interrupt status
 ###### `status()`
 ###### `clearInterrupts()`
 
 <hr>
 
-#### Set Time functions
+### Set Time functions
 ###### `setTime(sec, min, hour, weekday, date, month, year);`
 ###### `setSeconds(value)`
 ###### `setMinutes(value)`
@@ -59,7 +58,7 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 
 <hr>
 
-#### Get Time functions
+### Get Time functions
 Please call "updateTime()" before calling one of the other getTime functions.
 ###### `updateTime()`
 ###### `getSeconds()`
@@ -76,14 +75,14 @@ Please call "updateTime()" before calling one of the other getTime functions.
 
 <hr>
 
-#### UNIX Time functions
+### UNIX Time functions
 Attention: UNIX Time and real time are INDEPENDENT!
 ###### `setUNIX(value)`
 ###### `getUNIX()`
 
 <hr>
 
-#### Alarm Interrupt functions
+### Alarm Interrupt functions
 ###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode)`
 ###### `disableAlarmInterrupt()`
 ###### `readAlarmInterruptFlag()`
@@ -102,8 +101,8 @@ For further information about the alarm mode see [*Application Manual p. 68*](ht
 
 <hr>
 
-#### Countdown Timer Interrupt functions
-Thanks @JasonEdinburgh for this enhancement.
+### Countdown Timer Interrupt functions
+Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
 ###### `setTimer(bool timer_repeat, timer_frequency, timer_value, bool setInterrupt, bool Go)`
 ###### `enableTimer()`
 ###### `disableTimer()`
@@ -114,8 +113,8 @@ Thanks @JasonEdinburgh for this enhancement.
 
 <hr>
 
-#### Periodic Time Update Interrupt functions
-Thanks @JasonEdinburgh for this enhancement.
+### Periodic Time Update Interrupt functions
+Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
 ###### `setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)`
 ###### `disablePeriodicUpdateInterrupt()`
 ###### `readPeriodicUpdateInterruptFlag()`
@@ -123,7 +122,7 @@ Thanks @JasonEdinburgh for this enhancement.
 
 <hr>
 
-#### Trickle Charge functions
+### Trickle Charge functions
 ###### `enableTrickleCharge(uint8_t tcr = TCR_11K)`
 ###### `disableTrickleCharge()`
 At "enableTrickleCharge" you can choose the series resistor:  
@@ -135,7 +134,7 @@ See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Pr
 
 <hr>
 
-#### Backup Switchover Mode
+### Backup Switchover Mode
 ###### `setBackupSwitchoverMode(mode)`
 0 = Switchover disabled  
 1 = Direct Switching Mode  
