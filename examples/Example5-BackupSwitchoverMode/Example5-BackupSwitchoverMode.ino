@@ -42,7 +42,7 @@ void setup() {
   Serial.print("Config EEPROM 0x37 after: ");
   Serial.println(rtc.readConfigEEPROM_RAMmirror(0x37));
   
-  //For more information see https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=43
+  //For more information see https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=45
 }
 
 void loop() {
