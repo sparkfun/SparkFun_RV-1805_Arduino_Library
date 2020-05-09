@@ -15,7 +15,6 @@ This library allows the user to:
 * Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging and power switchover mode.
 
 Examples are included to get you started (still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
-```
 
 Repository Contents
 -------------------
