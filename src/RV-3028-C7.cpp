@@ -76,8 +76,8 @@ boolean RV3028::begin(TwoWire &wirePort)
 	//_i2cPort->begin();
 	_i2cPort = &wirePort;
 
-	set24Hour(); delay(1);
-	disableTrickleCharge(); delay(1);
+	//set24Hour(); delay(1);
+	//disableTrickleCharge(); delay(1);
 
 	return(setBackupSwitchoverMode(3) && writeRegister(RV3028_STATUS, 0x00));
 }
