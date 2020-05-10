@@ -34,10 +34,10 @@ void setup() {
   Serial.print("Config EEPROM 0x37 before: ");
   Serial.println(rtc.readConfigEEPROM_RAMmirror(0x37));
 
-  rtc.enableTrickleCharge(0);   //series resistor 3kOhm
-  //rtc.enableTrickleCharge(1); //series resistor 5kOhm
-  //rtc.enableTrickleCharge(2); //series resistor 9kOhm
-  //rtc.enableTrickleCharge(3); //series resistor 15kOhm
+  rtc.enableTrickleCharge(TCR_3K);   //series resistor 3kOhm
+  //rtc.enableTrickleCharge(TCR_5K); //series resistor 5kOhm
+  //rtc.enableTrickleCharge(TCR_9K); //series resistor 9kOhm
+  //rtc.enableTrickleCharge(TCR_15K); //series resistor 15kOhm
   //rtc.disableTrickleCharge(); //Trickle Charger disabled
 
   Serial.print("Config EEPROM 0x37 after: ");
