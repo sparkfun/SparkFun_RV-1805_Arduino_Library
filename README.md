@@ -12,9 +12,9 @@ This library allows the user to:
 
 * Set time using hard numbers or the BUILD_TIME from the Arduino compiler
 * Read time
-* Configure various aspects of the RTC including setting of alarms, trickle charging or power switchover mode
+* Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging and power switchover mode.
 
-Examples are included to get you started.
+Examples are included to get you started (but still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
 
 Repository Contents
 -------------------
@@ -27,13 +27,9 @@ Repository Contents
 Documentation
 --------------
 The library enables the following functions:
-<hr>
 
-#### General functions
-<hr>
-
+### General functions
 Please call begin() sometime after initializing the I2C interface with Wire.begin().
-
 ###### `begin()`
 ###### `is12Hour()`
 ###### `isPM()`
@@ -42,9 +38,13 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 
 <hr>
 
-#### Set Time functions
+### Interrupt status
+###### `status()`
+###### `clearInterrupts()`
+
 <hr>
 
+### Set Time functions
 ###### `setTime(sec, min, hour, weekday, date, month, year);`
 ###### `setSeconds(value)`
 ###### `setMinutes(value)`
@@ -57,11 +57,8 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 
 <hr>
 
-#### Get Time functions
-<hr>
-
+### Get Time functions
 Please call "updateTime()" before calling one of the other getTime functions.
-
 ###### `updateTime()`
 ###### `getSeconds()`
 ###### `getMinutes()`
@@ -77,23 +74,18 @@ Please call "updateTime()" before calling one of the other getTime functions.
 
 <hr>
 
-#### UNIX Time functions
-<hr>
-
+### UNIX Time functions
 Attention: UNIX Time and real time are INDEPENDENT!
-
 ###### `setUNIX(value)`
 ###### `getUNIX()`
 
 <hr>
 
-#### Alarm Interrupt functions
-<hr>
-
+### Alarm Interrupt functions
 ###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode)`
 ###### `disableAlarmInterrupt()`
 ###### `readAlarmInterruptFlag()`
-
+###### `clearAlarmInterruptFlag()`
 Set the alarm mode in the following way:  
 0: When minutes, hours and weekday/date match (once per weekday/date)  
 1: When hours and weekday/date match (once per weekday/date)  
@@ -103,17 +95,46 @@ Set the alarm mode in the following way:
 5: When hours match (once per day)  
 6: When minutes match (once per hour)  
 7: All disabled – Default value  
-If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).  
+If you want to set a weekday alarm (_setWeekdayAlarm_not_Date_ = true), set _date_or_weekday_ from 0 (Sunday) to 6 (Saturday).  
 For further information about the alarm mode see [*Application Manual p. 68*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=68).
 
 <hr>
 
-#### Trickle charge functions
+### Countdown Timer Interrupt functions
+Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
+###### `setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer)`
+###### `enableTimer()`
+###### `disableTimer()`
+###### `enableTimerInterrupt()`
+###### `disableTimerInterrupt()`
+###### `readTimerInterruptFlag()`
+###### `clearTimerInterruptFlag()`
+_timer_repeat_  specifies either Single or Repeat Mode for the Periodic Countdown Timer.  
+Setting of _timer_frequency_:
+| _timer_frequency_ |        | error on first time | max. duration (_timer_value = 4095_) |
+|:-----------------:|:------:|:-------------------:|:------------------------------------:|
+| 4096 (default)    | 4096Hz | 122us               | 0.9998s                              |
+| 64                | 64Hz   | 7.813ms             | 63.984s                              |
+| 1                 | 1Hz    | 7.813ms             | 4095s                                |
+| 60000             | 1/60Hz | 7.813ms             | 4095min                              |  
+
+Countdown Period [s] = Timer Value / Timer Frequency  
+See [*Application Manual p. 63*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=63) for more information.
 <hr>
 
+### Periodic Time Update Interrupt functions
+Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.  
+###### `setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)`
+###### `disablePeriodicUpdateInterrupt()`
+###### `readPeriodicUpdateInterruptFlag()`
+###### `clearPeriodicUpdateInterruptFlag()`
+_every_second_ specifies the interrupt to occur either every second or every minute.
+
+<hr>
+
+### Trickle Charge functions
 ###### `enableTrickleCharge(uint8_t tcr = TCR_11K)`
 ###### `disableTrickleCharge()`
-
 At "enableTrickleCharge" you can choose the series resistor:  
 TCR_1K for 1kOhm  
 TCR_3K for 3kOhm  
@@ -123,11 +144,8 @@ See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Pr
 
 <hr>
 
-#### Backup Switchover Mode
-<hr>
-
+### Backup Switchover Mode
 ###### `setBackupSwitchoverMode(mode)`
-
 0 = Switchover disabled  
 1 = Direct Switching Mode  
 2 = Standby Mode  

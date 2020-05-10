@@ -98,6 +98,7 @@ Distributed as-is; no warranty is given.
 
 //EEPROM Registers
 #define EEPROM_Clkout_Register			0x35
+#define RV3028_EEOffset_8_1				0x36	//bits 8 to 1 of EEOffset. Bit 0 is bit 7 of register 0x37 
 #define EEPROM_Backup_Register			0x37
 
 
@@ -160,26 +161,33 @@ Distributed as-is; no warranty is given.
 #define	TCR_6K							0b10			//Trickle Charge Resistor 6kOhm
 #define	TCR_11K							0b11			//Trickle Charge Resistor 11kOhm
 
+
 // Clock output register (0x35)
 #define EEPROMClkout_CLKOE_BIT			7				//1 = CLKOUT pin is enabled. – Default value on delivery 
 #define EEPROMClkout_CLKSY_BIT			6
 // Bits 5 and 4 not implemented
-#define EEPROMClkout_PORIE				3				//0 = No interrupt, or canceled, signal on INT pin at POR. – Default value on delivery
-														//1 = An interrupt signal on INT pin at POR. Retained until the PORF flag is cleared to 0 (no automatic cancellation). 
+#define EEPROMClkout_PORIE				  3				//0 = No interrupt, or canceled, signal on INT pin at POR. – Default value on delivery
+														                //1 = An interrupt signal on INT pin at POR. Retained until the PORF flag is cleared to 0 (no automatic cancellation). 
 #define EEPROMClkout_FREQ_SHIFT			0				//frequency shift
-#define FD_CLKOUT_32k					0b000			//32.768 kHz –Default value on delivery 
+#define FD_CLKOUT_32k					  0b000			  //32.768 kHz –Default value on delivery 
 #define FD_CLKOUT_8192					0b001 			//8192 Hz 
-#define FD_CLKOUT_1024					0b010			//1024 Hz
-#define FD_CLKOUT_64					0b011 			//64 Hz 
-#define FD_CLKOUT_32					0b100			//32 Hz
-#define FD_CLKOUT_1						0b101 			//1 Hz 
-#define FD_CLKOUT_TIMER					0b110			//Predefined periodic countdown timer interrupt 
-#define FD_CLKOUT_LOW					0b111 			//CLKOUT = LOW 
+#define FD_CLKOUT_1024					0b010			  //1024 Hz
+#define FD_CLKOUT_64					  0b011 		  //64 Hz 
+#define FD_CLKOUT_32					  0b100			  //32 Hz
+#define FD_CLKOUT_1						  0b101 		 	//1 Hz 
+#define FD_CLKOUT_TIMER					0b110			  //Predefined periodic countdown timer interrupt 
+#define FD_CLKOUT_LOW					  0b111 			//CLKOUT = LOW 
+
+
+#define IMT_MASK_CEIE					3				//Clock output when Event Interrupt bit. 
+#define IMT_MASK_CAIE					2				//Clock output when Alarm Interrupt bit.
+#define IMT_MASK_CTIE					1				//Clock output when Periodic Countdown Timer Interrupt bit.
+#define IMT_MASK_CUIE					0				//Clock output when Periodic Time Update Interrupt bit.
 
 
 #define TIME_ARRAY_LENGTH 7 // Total number of writable values in device
 
-enum time_order {		
+enum time_order {
 	TIME_SECONDS,    // 0
 	TIME_MINUTES,    // 1
 	TIME_HOURS,      // 2
@@ -195,7 +203,7 @@ public:
 
 	RV3028(void);
 
-	boolean begin(TwoWire &wirePort = Wire);
+	bool begin(TwoWire &wirePort = Wire, bool set_24Hour = true, bool disable_TrickleCharge = true, bool set_LevelSwitchingMode = true);
 
 	bool setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year);
 	bool setTime(uint8_t * time, uint8_t len);
@@ -221,7 +229,7 @@ public:
 	uint8_t getWeekday();
 	uint8_t getDate();
 	uint8_t getMonth();
-	uint16_t getYear();	
+	uint16_t getYear();
 
 
 	bool is12Hour(); //Returns true if 12hour bit is set
@@ -236,6 +244,20 @@ public:
 	void enableAlarmInterrupt();
 	void disableAlarmInterrupt();
 	bool readAlarmInterruptFlag();
+	void clearAlarmInterruptFlag();
+
+	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer);
+	void enableTimer();
+	void disableTimer();
+	void enableTimerInterrupt();
+	void disableTimerInterrupt();
+	bool readTimerInterruptFlag();
+	void clearTimerInterruptFlag();
+
+	void setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output);
+	void disablePeriodicUpdateInterrupt();
+	bool readPeriodicUpdateInterruptFlag();
+	void clearPeriodicUpdateInterruptFlag();
 
 	void enableTrickleCharge(uint8_t tcr = TCR_11K); //Trickle Charge Resistor default 11k
 	void disableTrickleCharge();
@@ -245,10 +267,10 @@ public:
 	void disableClockOut();
 	
 	uint8_t status(); //Returns the status byte
-	void clearInterrupts(); 
+	void clearInterrupts();
 
 	//Values in RTC are stored in Binary Coded Decimal. These functions convert to/from Decimal
-	uint8_t BCDtoDEC(uint8_t val); 
+	uint8_t BCDtoDEC(uint8_t val);
 	uint8_t DECtoBCD(uint8_t val);
 
 	uint8_t readRegister(uint8_t addr);
@@ -259,14 +281,16 @@ public:
 	bool writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val);
 	uint8_t readConfigEEPROM_RAMmirror(uint8_t eepromaddr);
 	bool waitforEEPROM();
+	void reset();
 
-private:	
+	void setBit(uint8_t reg_addr, uint8_t bit_num);
+	void clearBit(uint8_t reg_addr, uint8_t bit_num);
+	bool readBit(uint8_t reg_addr, uint8_t bit_num);
+private:
 	uint8_t _time[TIME_ARRAY_LENGTH];
 	TwoWire *_i2cPort;
 };
 
 //POSSIBLE ENHANCEMENTS :
-//ENHANCEMENT: Countdown Timer / Countdown Interrupt
-//ENHANCEMENT: Periodic Time Update Interrupt
 //ENHANCEMENT: Battery Interrupt / check battery voltage
 //ENHANCEMENT: Clock Output
