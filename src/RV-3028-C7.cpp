@@ -510,7 +510,7 @@ void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t time
 			ctrl1_val |= 2;
 		break;
 		
-		case 60000:		// 60 seconds			// up to 7.813ms error on first time
+		case 60000:		// 1/60Hz				// up to 7.813ms error on first time
 			ctrl1_val |= 3; // Set both bits
 		break;
 		

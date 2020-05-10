@@ -14,7 +14,7 @@ This library allows the user to:
 * Read time
 * Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging and power switchover mode.
 
-Examples are included to get you started (still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
+Examples are included to get you started (but still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
 
 Repository Contents
 -------------------
@@ -95,25 +95,35 @@ Set the alarm mode in the following way:
 5: When hours match (once per day)  
 6: When minutes match (once per hour)  
 7: All disabled – Default value  
-If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday).  
+If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set _date_or_weekday_ from 0 (Sunday) to 6 (Saturday).  
 For further information about the alarm mode see [*Application Manual p. 68*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=68).
 
 <hr>
 
 ### Countdown Timer Interrupt functions
 Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
-###### `setTimer(bool timer_repeat, timer_frequency, timer_value, bool setInterrupt, bool Go)`
+###### `setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer)`
 ###### `enableTimer()`
 ###### `disableTimer()`
 ###### `enableTimerInterrupt()`
 ###### `disableTimerInterrupt()`
 ###### `readTimerInterruptFlag()`
 ###### `clearTimerInterruptFlag()`
-
+_timer_repeat_  specifies either Single or Repeat Mode for the Periodic Countdown Timer.  
+Setting of _timer_frequency_:
+| _timer_frequency_ |        | error on first time | max. duration (_timer_value = 4095_) |
+|:-----------------:|:------:|:-------------------:|:------------------------------------:|
+| 4096 (default)    | 4096Hz | 122us               | 0.9998s                              |
+| 64                | 64Hz   | 7.813ms             | 63.984s                              |
+| 1                 | 1Hz    | 7.813ms             | 4095s                                |
+| 60000             | 1/60Hz | 7.813ms             | 4095min                              |
+Countdown Period [s] = Timer Value / Timer Frequency  
+See [*Application Manual p. 63*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=63) for more information.
 <hr>
 
 ### Periodic Time Update Interrupt functions
-Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
+Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.  
+_every_second_ specifies the interrupt to occur either every second or every minute.
 ###### `setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)`
 ###### `disablePeriodicUpdateInterrupt()`
 ###### `readPeriodicUpdateInterruptFlag()`

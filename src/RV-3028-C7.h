@@ -227,7 +227,7 @@ public:
 	bool readAlarmInterruptFlag();
 	void clearAlarmInterruptFlag();
 
-	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool Go);
+	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer);
 	void enableTimer();
 	void disableTimer();
 	void enableTimerInterrupt();
