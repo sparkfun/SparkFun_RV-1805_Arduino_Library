@@ -40,6 +40,7 @@ is12Hour	KEYWORD2
 isPM	KEYWORD2
 set12Hour	KEYWORD2
 set24Hour	KEYWORD2
+reset	KEYWORD2
 
 setUNIX	KEYWORD2
 getUNIX	KEYWORD2
@@ -49,11 +50,15 @@ disableAlarmInterrupt	KEYWORD2
 readAlarmInterruptFlag	KEYWORD2
 clearAlarmInterruptFlag	KEYWORD2
 
+setTimer	KEYWORD2
+enableTimer	KEYWORD2
 disableTimer	KEYWORD2
+enableTimerInterrupt	KEYWORD2
 disableTimerInterrupt	KEYWORD2
 readTimerInterruptFlag	KEYWORD2
 clearTimerInterruptFlag	KEYWORD2
 
+enablePeriodicUpdateInterrupt	KEYWORD2
 disablePeriodicUpdateInterrupt	KEYWORD2
 readPeriodicUpdateInterruptFlag	KEYWORD2
 clearPeriodicUpdateInterruptFlag	KEYWORD2
@@ -63,7 +68,10 @@ disableTrickleCharge	KEYWORD2
 setBackupSwitchoverMode	KEYWORD2
 
 enableClockOut	KEYWORD2
+enableInterruptControlledClockout	KEYWORD2
 disableClockOut	KEYWORD2
+readClockOutputInterruptFlag	KEYWORD2
+clearClockOutputInterruptFlag	KEYWORD2
 
 status	KEYWORD2
 clearInterrupts	KEYWORD2

@@ -167,9 +167,9 @@ Distributed as-is; no warranty is given.
 #define EEPROMClkout_CLKSY_BIT			6
 // Bits 5 and 4 not implemented
 #define EEPROMClkout_PORIE				  3				//0 = No interrupt, or canceled, signal on INT pin at POR. – Default value on delivery
-														                //1 = An interrupt signal on INT pin at POR. Retained until the PORF flag is cleared to 0 (no automatic cancellation). 
+																		//1 = An interrupt signal on INT pin at POR. Retained until the PORF flag is cleared to 0 (no automatic cancellation). 
 #define EEPROMClkout_FREQ_SHIFT			0				//frequency shift
-#define FD_CLKOUT_32k					  0b000			  //32.768 kHz –Default value on delivery 
+#define FD_CLKOUT_32k					  0b000			  //32.768 kHz – Default value on delivery 
 #define FD_CLKOUT_8192					0b001 			//8192 Hz 
 #define FD_CLKOUT_1024					0b010			  //1024 Hz
 #define FD_CLKOUT_64					  0b011 		  //64 Hz 
@@ -240,13 +240,13 @@ public:
 	bool setUNIX(uint32_t value);//Set the UNIX Time (Real Time and UNIX Time are INDEPENDENT!)
 	uint32_t getUNIX();
 
-	void enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode);
+	void enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode, bool enable_clock_output = false);
 	void enableAlarmInterrupt();
 	void disableAlarmInterrupt();
 	bool readAlarmInterruptFlag();
 	void clearAlarmInterruptFlag();
 
-	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer);
+	void setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer, bool enable_clock_output = false);
 	void enableTimer();
 	void disableTimer();
 	void enableTimerInterrupt();
@@ -254,7 +254,7 @@ public:
 	bool readTimerInterruptFlag();
 	void clearTimerInterruptFlag();
 
-	void setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output);
+	void enablePeriodicUpdateInterrupt(bool every_second, bool enable_clock_output = false);
 	void disablePeriodicUpdateInterrupt();
 	bool readPeriodicUpdateInterruptFlag();
 	void clearPeriodicUpdateInterruptFlag();
@@ -264,8 +264,11 @@ public:
 	bool setBackupSwitchoverMode(uint8_t val);
 
 	void enableClockOut(uint8_t freq);
+	void enableInterruptControlledClockout(uint8_t freq);
 	void disableClockOut();
-	
+	bool readClockOutputInterruptFlag();
+	void clearClockOutputInterruptFlag();
+
 	uint8_t status(); //Returns the status byte
 	void clearInterrupts();
 
@@ -293,4 +296,4 @@ private:
 
 //POSSIBLE ENHANCEMENTS :
 //ENHANCEMENT: Battery Interrupt / check battery voltage
-//ENHANCEMENT: Clock Output
+//ENHANCEMENT: External Event Interrupt

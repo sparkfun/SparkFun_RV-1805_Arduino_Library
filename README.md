@@ -12,9 +12,9 @@ This library allows the user to:
 
 * Set time using hard numbers or the BUILD_TIME from the Arduino compiler
 * Read time
-* Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update, trickle charging and power switchover mode.
+* Configure various aspects of the RTC including setting of alarms, countdown timers, periodic time update interrupts, trickle charging, power switchover mode and programmable clock output.
 
-Examples are included to get you started (but still missing for CountdownTimer and PeriodicTimeUpdate Interrupt).
+Examples are included to get you started (but still missing for CountdownTimer, PeriodicTimeUpdate Interrupt and Programmable Clock Output).
 
 Repository Contents
 -------------------
@@ -35,6 +35,7 @@ Please call begin() sometime after initializing the I2C interface with Wire.begi
 ###### `isPM()`
 ###### `set12Hour()`
 ###### `set24Hour()`
+###### `reset()`
 
 <hr>
 
@@ -82,7 +83,7 @@ Attention: UNIX Time and real time are INDEPENDENT!
 <hr>
 
 ### Alarm Interrupt functions
-###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode)`
+###### `enableAlarmInterrupt(min, hour, date_or_weekday, bool setWeekdayAlarm_not_Date, mode, bool enable_clock_output = false)`
 ###### `disableAlarmInterrupt()`
 ###### `readAlarmInterruptFlag()`
 ###### `clearAlarmInterruptFlag()`
@@ -102,7 +103,7 @@ For further information about the alarm mode see [*Application Manual p. 68*](ht
 
 ### Countdown Timer Interrupt functions
 Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.
-###### `setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer)`
+###### `setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool setInterrupt, bool start_timer, bool enable_clock_output = false)`
 ###### `enableTimer()`
 ###### `disableTimer()`
 ###### `enableTimerInterrupt()`
@@ -124,7 +125,7 @@ See [*Application Manual p. 63*](https://www.microcrystal.com/fileadmin/Media/Pr
 
 ### Periodic Time Update Interrupt functions
 Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.  
-###### `setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)`
+###### `enablePeriodicUpdateInterrupt(bool every_second, bool enable_clock_output = false)`
 ###### `disablePeriodicUpdateInterrupt()`
 ###### `readPeriodicUpdateInterruptFlag()`
 ###### `clearPeriodicUpdateInterruptFlag()`
@@ -151,6 +152,31 @@ See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Pr
 2 = Standby Mode  
 3 = Level Switching Mode  
 See [*Application Manual p. 45*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=45) for more information.
+
+<hr>
+
+### Programmable Clock Output
+
+###### `enableClockOut(uint8_t freq)`
+###### `enableInterruptControlledClockout(uint8_t freq)`
+###### `disableClockOut()`
+###### `readClockOutputInterruptFlag()`
+###### `clearClockOutputInterruptFlag()`
+Set Clockout Frequency _freq_ as follows:
+| _freq_          | result                                        |
+|-----------------|:---------------------------------------------:|
+| FD_CLKOUT_32k   | 32.768 kHz                                    |
+| FD_CLKOUT_8192  | 8192 Hz                                       |
+| FD_CLKOUT_1024  | 1024 Hz                                       |
+| FD_CLKOUT_64    | 64 Hz                                         |
+| FD_CLKOUT_32    | 32 Hz                                         |
+| FD_CLKOUT_1     | 1 Hz                                          |
+| FD_CLKOUT_TIMER | Predefined periodic countdown timer interrupt |
+| FD_CLKOUT_LOW   | CLKOUT = LOW                                  |  
+
+See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=48) for more information.
+'enableInterruptControlledClockout' generally enables the Interrupt Controlled Clockout (required for triggering Clockout at Alarm, PeriodicUpdate and CountdownTimer Interrupts).
+
 
 License Information
 -------------------

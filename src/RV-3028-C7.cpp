@@ -76,6 +76,7 @@ bool RV3028::begin(TwoWire &wirePort, bool set_24Hour, bool disable_TrickleCharg
 	//_i2cPort->begin();
 	_i2cPort = &wirePort;
 
+	delay(1);
 	if (set_24Hour) { set24Hour(); delay(1); }
 	if (disable_TrickleCharge) { disableTrickleCharge(); delay(1); }
 
@@ -420,7 +421,7 @@ Set the alarm mode in the following way:
 7: All disabled � Default value
 If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_or_weekday' from 0 (Sunday) to 6 (Saturday)
 ********************************/
-void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode)
+void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode, bool enable_clock_output)
 {
 	//disable Alarm Interrupt to prevent accidental interrupts during configuration
 	disableAlarmInterrupt();
@@ -453,6 +454,12 @@ void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_wee
 
 	//enable Alarm Interrupt
 	enableAlarmInterrupt();
+
+	//Clock output?
+	if (enable_clock_output)
+		setBit(RV3028_INT_MASK, IMT_MASK_CAIE);
+	else
+		clearBit(RV3028_INT_MASK, IMT_MASK_CAIE);
 }
 
 void RV3028::enableAlarmInterrupt()
@@ -476,7 +483,10 @@ void RV3028::clearAlarmInterruptFlag()
 	clearBit(RV3028_STATUS, STATUS_AF);
 }
 
-void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool set_interrupt, bool start_timer)
+/*********************************
+Countdown Timer Interrupt
+********************************/
+void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool set_interrupt, bool start_timer, bool enable_clock_output)
 {
 	disableTimer();
 	disableTimerInterrupt();
@@ -525,6 +535,12 @@ void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t time
 		ctrl1_val |= (1 << CTRL1_TE);
 	}
 	writeRegister(RV3028_CTRL1, ctrl1_val);
+
+	//Clock output?
+	if (enable_clock_output)
+		setBit(RV3028_INT_MASK, IMT_MASK_CTIE);
+	else
+		clearBit(RV3028_INT_MASK, IMT_MASK_CTIE);
 }
 
 
@@ -558,7 +574,10 @@ void RV3028::disableTimer()
 	clearBit(RV3028_CTRL1, CTRL1_TE);
 }
 
-void RV3028::setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)
+/*********************************
+Periodic Time Update Interrupt
+********************************/
+void RV3028::enablePeriodicUpdateInterrupt(bool every_second, bool enable_clock_output)
 {
 	disablePeriodicUpdateInterrupt();
 	clearPeriodicUpdateInterruptFlag();
@@ -572,15 +591,13 @@ void RV3028::setPeriodicUpdate(bool every_second, bool enable_interrupt, bool en
 		setBit(RV3028_CTRL1, CTRL1_USEL);
 	}
 
-	if (enable_interrupt)
-	{
-		setBit(RV3028_CTRL2, CTRL2_UIE);
-	}
+	setBit(RV3028_CTRL2, CTRL2_UIE);
 
+	//Clock output?
 	if (enable_clock_output)
-	{
 		setBit(RV3028_INT_MASK, IMT_MASK_CUIE);
-	}
+	else
+		clearBit(RV3028_INT_MASK, IMT_MASK_CUIE);
 }
 
 void RV3028::disablePeriodicUpdateInterrupt()
@@ -630,29 +647,6 @@ void RV3028::disableTrickleCharge()
 	writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup);
 }
 
-void RV3028::enableClockOut(uint8_t freq)
-{
-	if (freq > 7) return; // check out of bounds
-	//Read EEPROM CLKOUT Register (0x35)
-	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
-	//Ensure CLKOE Bit is set to 1
-	EEPROMBackup |= 1 << EEPROMClkout_CLKOE_BIT;
-	//Shift values into EEPROM Backup Register
-	EEPROMBackup |= freq << EEPROMClkout_FREQ_SHIFT;	
-	//Write EEPROM Backup Register
-	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMBackup);
-}
-
-void RV3028::disableClockOut()
-{
-	//Read EEPROM CLKOUT Register (0x35)
-	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
-	//Write 0 to CLKOE Bit
-	EEPROMBackup &= ~(1 << EEPROMClkout_CLKOE_BIT);
-	//Write EEPROM Backup Register
-	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMBackup);
-}
-
 
 /*********************************
 0 = Switchover disabled
@@ -680,6 +674,60 @@ bool RV3028::setBackupSwitchoverMode(uint8_t val)
 }
 
 
+/*********************************
+Clock Out functions
+********************************/
+void RV3028::enableClockOut(uint8_t freq)
+{
+	if (freq > 7) return; // check out of bounds
+	//Read EEPROM CLKOUT Register (0x35)
+	uint8_t EEPROMClkout = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
+	//Ensure CLKOE Bit is set to 1
+	EEPROMClkout |= 1 << EEPROMClkout_CLKOE_BIT;
+	//Shift values into EEPROM Backup Register
+	EEPROMClkout |= freq << EEPROMClkout_FREQ_SHIFT;
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMClkout);
+}
+
+void RV3028::enableInterruptControlledClockout(uint8_t freq)
+{
+	if (freq > 7) return; // check out of bounds
+	//Read EEPROM CLKOUT Register (0x35)
+	uint8_t EEPROMClkout = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
+	//Shift values into EEPROM Backup Register
+	EEPROMClkout |= freq << EEPROMClkout_FREQ_SHIFT;
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMClkout);
+
+	//Set CLKIE Bit
+	setBit(RV3028_CTRL2, CTRL2_CLKIE);
+}
+
+void RV3028::disableClockOut()
+{
+	//Read EEPROM CLKOUT Register (0x35)
+	uint8_t EEPROMClkout = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
+	//Clear CLKOE Bit
+	EEPROMClkout &= ~(1 << EEPROMClkout_CLKOE_BIT);
+	//Write EEPROM CLKOUT Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMClkout);
+
+	//Clear CLKIE Bit
+	clearBit(RV3028_CTRL2, CTRL2_CLKIE);
+}
+
+bool RV3028::readClockOutputInterruptFlag()
+{
+	return readBit(RV3028_STATUS, STATUS_CLKF);
+}
+
+void RV3028::clearClockOutputInterruptFlag()
+{
+	clearBit(RV3028_STATUS, STATUS_CLKF);
+}
+
+
 //Returns the status byte
 uint8_t RV3028::status(void)
 {
@@ -691,6 +739,13 @@ void RV3028::clearInterrupts() //Read the status register to clear the current i
 	writeRegister(RV3028_STATUS, 0);
 }
 
+
+
+
+
+/*********************************
+FOR INTERNAL USE
+********************************/
 uint8_t RV3028::BCDtoDEC(uint8_t val)
 {
 	return ((val / 0x10) * 10) + (val % 0x10);

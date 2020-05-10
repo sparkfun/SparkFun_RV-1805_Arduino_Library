@@ -76,6 +76,7 @@ void loop() {
   //Read Alarm Flag
   if (rtc.readAlarmInterruptFlag()) {
     Serial.println("ALARM!!!!");
+    rtc.clearAlarmInterruptFlag();
     delay(3000);
   }
 
