@@ -599,11 +599,11 @@ void RV3028::clearPeriodicUpdateInterruptFlag()
 }
 
 /*********************************
-Enable the Trickle Charger and set the Trickle Charge series resistor (default is 11k)
-TCR_1K  =  1kOhm
+Enable the Trickle Charger and set the Trickle Charge series resistor (default is 15k)
 TCR_3K  =  3kOhm
-TCR_6K  =  6kOhm
-TCR_11K = 11kOhm
+TCR_5K  =  5kOhm
+TCR_9K  =  9kOhm
+TCR_15K = 15kOhm
 *********************************/
 void RV3028::enableTrickleCharge(uint8_t tcr)
 {
