@@ -95,7 +95,7 @@ Set the alarm mode in the following way:
 5: When hours match (once per day)  
 6: When minutes match (once per hour)  
 7: All disabled – Default value  
-If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set _date_or_weekday_ from 0 (Sunday) to 6 (Saturday).  
+If you want to set a weekday alarm (_setWeekdayAlarm_not_Date_ = true), set _date_or_weekday_ from 0 (Sunday) to 6 (Saturday).  
 For further information about the alarm mode see [*Application Manual p. 68*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=68).
 
 <hr>
@@ -116,18 +116,19 @@ Setting of _timer_frequency_:
 | 4096 (default)    | 4096Hz | 122us               | 0.9998s                              |
 | 64                | 64Hz   | 7.813ms             | 63.984s                              |
 | 1                 | 1Hz    | 7.813ms             | 4095s                                |
-| 60000             | 1/60Hz | 7.813ms             | 4095min                              |
+| 60000             | 1/60Hz | 7.813ms             | 4095min                              |  
+
 Countdown Period [s] = Timer Value / Timer Frequency  
 See [*Application Manual p. 63*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=63) for more information.
 <hr>
 
 ### Periodic Time Update Interrupt functions
 Thanks [@JasonEdinburgh](https://github.com/JasonEdinburgh) for this enhancement.  
-_every_second_ specifies the interrupt to occur either every second or every minute.
 ###### `setPeriodicUpdate(bool every_second, bool enable_interrupt, bool enable_clock_output)`
 ###### `disablePeriodicUpdateInterrupt()`
 ###### `readPeriodicUpdateInterruptFlag()`
 ###### `clearPeriodicUpdateInterruptFlag()`
+_every_second_ specifies the interrupt to occur either every second or every minute.
 
 <hr>
 

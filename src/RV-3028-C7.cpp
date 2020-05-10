@@ -69,17 +69,17 @@ RV3028::RV3028(void)
 
 }
 
-bool RV3028::begin(TwoWire &wirePort)
+bool RV3028::begin(TwoWire &wirePort, bool set_24Hour, bool disable_TrickleCharge, bool set_LevelSwitchingMode)
 {
 	//We require caller to begin their I2C port, with the speed of their choice
 	//external to the library
 	//_i2cPort->begin();
 	_i2cPort = &wirePort;
 
-	set24Hour(); delay(1);
-	disableTrickleCharge(); delay(1);
+	if (set_24Hour) { set24Hour(); delay(1); }
+	if (disable_TrickleCharge) { disableTrickleCharge(); delay(1); }
 
-	return(setBackupSwitchoverMode(3) && writeRegister(RV3028_STATUS, 0x00));
+	return((set_LevelSwitchingMode ? setBackupSwitchoverMode(3) : true) && writeRegister(RV3028_STATUS, 0x00));
 }
 
 bool RV3028::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year)
@@ -423,7 +423,7 @@ If you want to set a weekday alarm (setWeekdayAlarm_not_Date = true), set 'date_
 void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_weekday, bool setWeekdayAlarm_not_Date, uint8_t mode)
 {
 	//disable Alarm Interrupt to prevent accidental interrupts during configuration
-	disableAlarmInterrupt(); 
+	disableAlarmInterrupt();
 	clearAlarmInterruptFlag();
 
 	//ENHANCEMENT: Add Alarm in 12 hour mode
@@ -431,9 +431,9 @@ void RV3028::enableAlarmInterrupt(uint8_t min, uint8_t hour, uint8_t date_or_wee
 
 	//Set WADA bit (Weekday/Date Alarm)
 	if (setWeekdayAlarm_not_Date)
-		clearBit (RV3028_CTRL1, CTRL1_WADA);
+		clearBit(RV3028_CTRL1, CTRL1_WADA);
 	else
-		setBit (RV3028_CTRL1, CTRL1_WADA);
+		setBit(RV3028_CTRL1, CTRL1_WADA);
 
 	//Write alarm settings in registers 0x07 to 0x09
 	uint8_t alarmTime[3];
@@ -479,12 +479,12 @@ void RV3028::clearAlarmInterruptFlag()
 void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t timer_value, bool set_interrupt, bool start_timer)
 {
 	disableTimer();
-	disableTimerInterrupt(); 
+	disableTimerInterrupt();
 	clearTimerInterruptFlag();
 
-	writeRegister(RV3028_TIMERVAL_0,  timer_value & 0xff);
-	writeRegister(RV3028_TIMERVAL_1,  timer_value >> 8);
-	
+	writeRegister(RV3028_TIMERVAL_0, timer_value & 0xff);
+	writeRegister(RV3028_TIMERVAL_1, timer_value >> 8);
+
 	uint8_t ctrl1_val = readRegister(RV3028_CTRL1);
 	if (timer_repeat)
 	{
@@ -494,28 +494,28 @@ void RV3028::setTimer(bool timer_repeat, uint16_t timer_frequency, uint16_t time
 	{
 		ctrl1_val &= ~(1 << CTRL1_TRPT);
 	}
- 	switch (timer_frequency)
+	switch (timer_frequency)
 	{
-		case 4096:		// 4096Hz (default)		// up to 122us error on first time
-			ctrl1_val &= ~3; // Clear both the bits
+	case 4096:		// 4096Hz (default)		// up to 122us error on first time
+		ctrl1_val &= ~3; // Clear both the bits
 		break;
-		
-		case 64:		// 64Hz					// up to 7.813ms error on first time
-			ctrl1_val &= ~3; // Clear both the bits
-			ctrl1_val |= 1;	
+
+	case 64:		// 64Hz					// up to 7.813ms error on first time
+		ctrl1_val &= ~3; // Clear both the bits
+		ctrl1_val |= 1;
 		break;
-		
-		case 1:			// 1Hz					// up to 7.813ms error on first time
-			ctrl1_val &= ~3; // Clear both the bits
-			ctrl1_val |= 2;
+
+	case 1:			// 1Hz					// up to 7.813ms error on first time
+		ctrl1_val &= ~3; // Clear both the bits
+		ctrl1_val |= 2;
 		break;
-		
-		case 60000:		// 1/60Hz				// up to 7.813ms error on first time
-			ctrl1_val |= 3; // Set both bits
+
+	case 60000:		// 1/60Hz				// up to 7.813ms error on first time
+		ctrl1_val |= 3; // Set both bits
 		break;
-		
+
 	}
-	
+
 	if (set_interrupt)
 	{
 		enableTimerInterrupt();
@@ -562,7 +562,7 @@ void RV3028::setPeriodicUpdate(bool every_second, bool enable_interrupt, bool en
 {
 	disablePeriodicUpdateInterrupt();
 	clearPeriodicUpdateInterruptFlag();
-	
+
 	if (every_second)
 	{
 		clearBit(RV3028_CTRL1, CTRL1_USEL);
@@ -571,12 +571,12 @@ void RV3028::setPeriodicUpdate(bool every_second, bool enable_interrupt, bool en
 	{	// every minute
 		setBit(RV3028_CTRL1, CTRL1_USEL);
 	}
-	
+
 	if (enable_interrupt)
 	{
 		setBit(RV3028_CTRL2, CTRL2_UIE);
 	}
-	
+
 	if (enable_clock_output)
 	{
 		setBit(RV3028_INT_MASK, IMT_MASK_CUIE);
@@ -585,7 +585,7 @@ void RV3028::setPeriodicUpdate(bool every_second, bool enable_interrupt, bool en
 
 void RV3028::disablePeriodicUpdateInterrupt()
 {
-	clearBit (RV3028_CTRL2, CTRL2_UIE);		
+	clearBit(RV3028_CTRL2, CTRL2_UIE);
 }
 
 bool RV3028::readPeriodicUpdateInterruptFlag()
@@ -595,7 +595,7 @@ bool RV3028::readPeriodicUpdateInterruptFlag()
 
 void RV3028::clearPeriodicUpdateInterruptFlag()
 {
-	clearBit (RV3028_STATUS, STATUS_UF);
+	clearBit(RV3028_STATUS, STATUS_UF);
 }
 
 /*********************************
@@ -687,7 +687,7 @@ uint8_t RV3028::readRegister(uint8_t addr)
 	_i2cPort->requestFrom(RV3028_ADDR, (uint8_t)1);
 	if (_i2cPort->available()) {
 		return _i2cPort->read();
-		}
+	}
 	else {
 		return (0xFF); //Error
 	}
@@ -814,8 +814,8 @@ void RV3028::clearBit(uint8_t reg_addr, uint8_t bit_num)
 bool RV3028::readBit(uint8_t reg_addr, uint8_t bit_num)
 {
 	uint8_t value = readRegister(reg_addr);
-	value &= (1 << bit_num); 
+	value &= (1 << bit_num);
 	return value;
-	
+
 }
 
