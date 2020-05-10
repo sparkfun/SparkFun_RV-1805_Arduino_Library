@@ -630,6 +630,30 @@ void RV3028::disableTrickleCharge()
 	writeConfigEEPROM_RAMmirror(EEPROM_Backup_Register, EEPROMBackup);
 }
 
+void RV3028::enableClockOut(uint8_t freq)
+{
+	if (freq > 7) return; // check out of bounds
+	//Read EEPROM CLKOUT Register (0x35)
+	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
+	//Ensure CLKOE Bit is set to 1
+	EEPROMBackup |= 1 << EEPROMClkout_CLKOE_BIT;
+	//Shift values into EEPROM Backup Register
+	EEPROMBackup |= freq << EEPROMClkout_FREQ_SHIFT;	
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMBackup);
+}
+
+void RV3028::disableClockOut()
+{
+	//Read EEPROM CLKOUT Register (0x35)
+	uint8_t EEPROMBackup = readConfigEEPROM_RAMmirror(EEPROM_Clkout_Register);
+	//Write 0 to CLKOE Bit
+	EEPROMBackup &= ~(1 << EEPROMClkout_CLKOE_BIT);
+	//Write EEPROM Backup Register
+	writeConfigEEPROM_RAMmirror(EEPROM_Clkout_Register, EEPROMBackup);
+}
+
+
 /*********************************
 0 = Switchover disabled
 1 = Direct Switching Mode
