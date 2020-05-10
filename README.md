@@ -134,13 +134,13 @@ _every_second_ specifies the interrupt to occur either every second or every min
 <hr>
 
 ### Trickle Charge functions
-###### `enableTrickleCharge(uint8_t tcr = TCR_11K)`
+###### `enableTrickleCharge(uint8_t tcr = TCR_15K)`
 ###### `disableTrickleCharge()`
 At "enableTrickleCharge" you can choose the series resistor:  
-TCR_1K for 1kOhm  
 TCR_3K for 3kOhm  
-TCR_6K for 6kOhm  
-TCR_11K for 11kOhm  
+TCR_5K for 5kOhm  
+TCR_9K for 9kOhm  
+TCR_15K for 15kOhm  
 See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=48) for more information.
 
 <hr>

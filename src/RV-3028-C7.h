@@ -156,10 +156,10 @@ Distributed as-is; no warranty is given.
 
 #define EEPROMBackup_BSM_CLEAR			0b11110011		//Backup Switchover Mode clear
 #define EEPROMBackup_TCR_CLEAR			0b11111100		//Trickle Charge Resistor clear
-#define	TCR_1K							0b00			//Trickle Charge Resistor 1kOhm
-#define	TCR_3K							0b01			//Trickle Charge Resistor 3kOhm
-#define	TCR_6K							0b10			//Trickle Charge Resistor 6kOhm
-#define	TCR_11K							0b11			//Trickle Charge Resistor 11kOhm
+#define	TCR_3K							0b00			//Trickle Charge Resistor 3kOhm
+#define	TCR_5K							0b01			//Trickle Charge Resistor 5kOhm
+#define	TCR_9K							0b10			//Trickle Charge Resistor 9kOhm
+#define	TCR_15K							0b11			//Trickle Charge Resistor 15kOhm
 
 
 // Clock output register (0x35)
@@ -259,7 +259,7 @@ public:
 	bool readPeriodicUpdateInterruptFlag();
 	void clearPeriodicUpdateInterruptFlag();
 
-	void enableTrickleCharge(uint8_t tcr = TCR_11K); //Trickle Charge Resistor default 11k
+	void enableTrickleCharge(uint8_t tcr = TCR_15K); //Trickle Charge Resistor default 15k
 	void disableTrickleCharge();
 	bool setBackupSwitchoverMode(uint8_t val);
 
