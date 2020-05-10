@@ -160,6 +160,22 @@ Distributed as-is; no warranty is given.
 #define	TCR_6K							0b10			//Trickle Charge Resistor 6kOhm
 #define	TCR_11K							0b11			//Trickle Charge Resistor 11kOhm
 
+// Clock output register (0x35)
+#define EEPROMClkout_CLKOE_BIT			7				//1 = CLKOUT pin is enabled. – Default value on delivery 
+#define EEPROMClkout_CLKSY_BIT			6
+// Bits 5 and 4 not implemented
+#define EEPROMClkout_PORIE				3				//0 = No interrupt, or canceled, signal on INT pin at POR. – Default value on delivery
+														//1 = An interrupt signal on INT pin at POR. Retained until the PORF flag is cleared to 0 (no automatic cancellation). 
+#define EEPROMClkout_FREQ_SHIFT			0				//frequency shift
+#define FD_CLKOUT_32k					0b000			//32.768 kHz –Default value on delivery 
+#define FD_CLKOUT_8192					0b001 			//8192 Hz 
+#define FD_CLKOUT_1024					0b010			//1024 Hz
+#define FD_CLKOUT_64					0b011 			//64 Hz 
+#define FD_CLKOUT_32					0b100			//32 Hz
+#define FD_CLKOUT_1						0b101 			//1 Hz 
+#define FD_CLKOUT_TIMER					0b110			//Predefined periodic countdown timer interrupt 
+#define FD_CLKOUT_LOW					0b111 			//CLKOUT = LOW 
+
 
 #define TIME_ARRAY_LENGTH 7 // Total number of writable values in device
 
@@ -225,7 +241,9 @@ public:
 	void disableTrickleCharge();
 	bool setBackupSwitchoverMode(uint8_t val);
 
-
+	void enableClockOut(uint8_t freq);
+	void disableClockOut();
+	
 	uint8_t status(); //Returns the status byte
 	void clearInterrupts(); 
 

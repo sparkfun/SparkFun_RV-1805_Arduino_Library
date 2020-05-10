@@ -52,6 +52,9 @@ enableTrickleCharge	KEYWORD2
 disableTrickleCharge	KEYWORD2
 setBackupSwitchoverMode	KEYWORD2
 
+enableClockOut	KEYWORD2
+disableClockOut	KEYWORD2
+
 status	KEYWORD2
 clearInterrupts	KEYWORD2
 
