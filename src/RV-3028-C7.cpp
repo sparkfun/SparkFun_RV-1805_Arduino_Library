@@ -69,7 +69,7 @@ RV3028::RV3028(void)
 
 }
 
-bool RV3028::begin(TwoWire &wirePort, bool set_24Hour, bool disable_TrickleCharge, bool set_LevelSwitchingMode)
+bool RV3028::begin(TwoWire &wirePort, bool set_24Hour, bool disable_TrickleCharge, bool set_LevelSwitchingMode, bool reset_Status)
 {
 	//We require caller to begin their I2C port, with the speed of their choice
 	//external to the library
@@ -80,7 +80,7 @@ bool RV3028::begin(TwoWire &wirePort, bool set_24Hour, bool disable_TrickleCharg
 	if (set_24Hour) { set24Hour(); delay(1); }
 	if (disable_TrickleCharge) { disableTrickleCharge(); delay(1); }
 
-	return((set_LevelSwitchingMode ? setBackupSwitchoverMode(3) : true) && writeRegister(RV3028_STATUS, 0x00));
+	return((set_LevelSwitchingMode ? setBackupSwitchoverMode(3) : true) && (reset_Status ? writeRegister(RV3028_STATUS, 0x00) : true));
 }
 
 bool RV3028::setTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t weekday, uint8_t date, uint8_t month, uint16_t year)
