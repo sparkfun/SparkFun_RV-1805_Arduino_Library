@@ -177,6 +177,13 @@ Set Clockout Frequency _freq_ as follows:
 See [*Application Manual p. 48*](https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C7_App-Manual.pdf#page=48) for more information.
 'enableInterruptControlledClockout' generally enables the Interrupt Controlled Clockout (required for triggering Clockout at Alarm, PeriodicUpdate and CountdownTimer Interrupts).
 
+<hr>
+
+### User EEPROM
+
+###### `writeUserEEPROM(uint8_t eepromaddr, uint8_t val)`
+###### `readUserEEPROM(uint8_t eepromaddr)`
+
 
 License Information
 -------------------

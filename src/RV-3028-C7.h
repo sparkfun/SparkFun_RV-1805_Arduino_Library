@@ -283,6 +283,8 @@ public:
 
 	bool writeConfigEEPROM_RAMmirror(uint8_t eepromaddr, uint8_t val);
 	uint8_t readConfigEEPROM_RAMmirror(uint8_t eepromaddr);
+	bool writeUserEEPROM(uint8_t eepromaddr, uint8_t val);
+	uint8_t readUserEEPROM(uint8_t eepromaddr);
 	bool waitforEEPROM();
 	void reset();
 

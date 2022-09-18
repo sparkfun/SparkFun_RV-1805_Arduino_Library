@@ -861,6 +861,57 @@ uint8_t RV3028::readConfigEEPROM_RAMmirror(uint8_t eepromaddr)
 	return eepromdata;
 }
 
+bool RV3028::writeUserEEPROM(uint8_t eepromaddr, uint8_t val)
+{
+	bool success = waitforEEPROM();
+
+	//Disable auto refresh by writing 1 to EERD control bit in CTRL1 register
+	uint8_t ctrl1 = readRegister(RV3028_CTRL1);
+	ctrl1 |= 1 << CTRL1_EERD;
+	if (!writeRegister(RV3028_CTRL1, ctrl1)) success = false;
+	//Write addr to EEADDR
+	writeRegister(0x25, eepromaddr);
+	//Write value to EEDATA
+	writeRegister(0x26, val);
+	//Update EEPROM (All Configuration RAM -> EEPROM)
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_First);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_WriteSingle);
+	if (!waitforEEPROM()) success = false;
+	//Reenable auto refresh by writing 0 to EERD control bit in CTRL1 register
+	ctrl1 = readRegister(RV3028_CTRL1);
+	if (ctrl1 == 0x00)success = false;
+	ctrl1 &= ~(1 << CTRL1_EERD);
+	writeRegister(RV3028_CTRL1, ctrl1);
+	if (!waitforEEPROM()) success = false;
+
+	return success;
+}
+
+uint8_t RV3028::readUserEEPROM(uint8_t eepromaddr)
+{
+	bool success = waitforEEPROM();
+
+	//Disable auto refresh by writing 1 to EERD control bit in CTRL1 register
+	uint8_t ctrl1 = readRegister(RV3028_CTRL1);
+	ctrl1 |= 1 << CTRL1_EERD;
+	if (!writeRegister(RV3028_CTRL1, ctrl1)) success = false;
+	//Read EEPROM Register
+	writeRegister(RV3028_EEPROM_ADDR, eepromaddr);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_First);
+	writeRegister(RV3028_EEPROM_CMD, EEPROMCMD_ReadSingle);
+	if (!waitforEEPROM()) success = false;
+	uint8_t eepromdata = readRegister(RV3028_EEPROM_DATA);
+	if (!waitforEEPROM()) success = false;
+	//Reenable auto refresh by writing 0 to EERD control bit in CTRL1 register
+	ctrl1 = readRegister(RV3028_CTRL1);
+	if (ctrl1 == 0x00)success = false;
+	ctrl1 &= ~(1 << CTRL1_EERD);
+	writeRegister(RV3028_CTRL1, ctrl1);
+
+	if (!success) return 0xFF;
+	return eepromdata;
+}
+
 //True if success, false if timeout occured
 bool RV3028::waitforEEPROM()
 {
